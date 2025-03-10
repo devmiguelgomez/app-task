@@ -15,7 +15,9 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://app-task-chi.vercel.app' // Replace with your frontend URL
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
