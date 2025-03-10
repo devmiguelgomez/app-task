@@ -15,11 +15,7 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: 'https://app-task-chi.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
