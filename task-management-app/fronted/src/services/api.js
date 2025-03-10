@@ -1,6 +1,6 @@
 // API service for making requests to the backend
 
-const API_URL = 'https://app-task-backend.vercel.app/api';
+const API_URL = 'https://app-task-chi.vercel.app/api';
 
 // Helper function to handle fetch requests
 const fetchWithAuth = async (url, options = {}) => {
