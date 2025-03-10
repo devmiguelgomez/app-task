@@ -1,6 +1,6 @@
 // API service for making requests to the backend
 
-const API_URL = 'https://app-task-backend.vercel.app/api';
+const API_URL = 'http://localhost:5000/api';
 
 // Helper function to handle fetch requests
 const fetchWithAuth = async (url, options = {}) => {
@@ -17,15 +17,13 @@ const fetchWithAuth = async (url, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  console.log('Making request to:', url, 'with options:', options); // Log the request URL and options
-  console.log('Token retrieved from localStorage:', token); // Log the token
+  // Make the request
   const response = await fetch(url, {
     ...options,
     headers,
   });
 
-  // Parse the JSON response and log the response status
-  console.log('Response status:', response.status); // Log the response status
+  // Parse the JSON response
   const data = await response.json();
 
   // If response is not ok, throw an error

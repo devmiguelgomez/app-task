@@ -15,12 +15,12 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors({}));
+app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI )
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/taskmanager')
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
