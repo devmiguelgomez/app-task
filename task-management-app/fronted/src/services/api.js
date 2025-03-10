@@ -17,13 +17,15 @@ const fetchWithAuth = async (url, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // Make the request
+  console.log('Making request to:', url, 'with options:', options); // Log the request URL and options
+  console.log('Token retrieved from localStorage:', token); // Log the token
   const response = await fetch(url, {
     ...options,
     headers,
   });
 
-  // Parse the JSON response
+  // Parse the JSON response and log the response status
+  console.log('Response status:', response.status); // Log the response status
   const data = await response.json();
 
   // If response is not ok, throw an error
