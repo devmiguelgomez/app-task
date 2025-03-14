@@ -18,20 +18,31 @@ const fetchWithAuth = async (url, options = {}) => {
   }
 
   // Make the request
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include', // Add this line to include credentials
+    });
 
-  // Parse the JSON response
-  const data = await response.json();
+    // Handle OPTIONS preflight response
+    if (response.status === 204) {
+      return { success: true };
+    }
 
-  // If response is not ok, throw an error
-  if (!response.ok) {
-    throw new Error(data.error || 'Algo salió mal');
+    // Parse the JSON response
+    const data = await response.json();
+
+    // If response is not ok, throw an error
+    if (!response.ok) {
+      throw new Error(data.error || 'Algo salió mal');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API request error:', error);
+    throw error;
   }
-
-  return data;
 };
 
 // Auth API calls
