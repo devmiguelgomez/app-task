@@ -16,7 +16,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://app-task-chi.vercel.app' // Replace with your frontend URL
+  origin: 'https://app-task-chi.vercel.app' // Asegúrate de que este sea el dominio correcto
 }));
 app.use(express.json());
 app.use(morgan('dev'));
