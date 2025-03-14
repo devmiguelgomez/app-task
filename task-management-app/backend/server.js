@@ -16,7 +16,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://app-task-chi.vercel.app' // Asegúrate de que este sea el dominio correcto
+  origin: ['https://app-task-chi.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 app.use(morgan('dev'));
