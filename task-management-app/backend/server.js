@@ -24,10 +24,31 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan('dev'));
 
+// MongoDB connection options
+const mongoOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+};
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/taskmanager')
+mongoose.connect(process.env.MONGO_URI, mongoOptions)
   .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    // Don't crash the server on connection error
+  });
+
+// Add connection error handler
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error:', err);
+});
+
+// Add disconnection handler
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -35,7 +56,12 @@ app.use('/api/tasks', taskRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Task Management API' });
+  // Add MongoDB connection status to the response
+  const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+  res.json({ 
+    message: 'Welcome to Task Management API',
+    mongoDBStatus: dbStatus
+  });
 });
 
 // Error handling middleware

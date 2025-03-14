@@ -20,7 +20,13 @@
   ],
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 30
+      "maxDuration": 60
+    },
+    "server.js": {
+      "maxDuration": 60
     }
+  },
+  "env": {
+    "NODE_ENV": "production"
   }
 }
