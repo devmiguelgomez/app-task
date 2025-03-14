@@ -22,7 +22,7 @@ const fetchWithAuth = async (url, options = {}) => {
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Add this line to include credentials
+      // Remove credentials: 'include' as it might be causing issues with CORS
     });
 
     // Handle OPTIONS preflight response
@@ -30,8 +30,26 @@ const fetchWithAuth = async (url, options = {}) => {
       return { success: true };
     }
 
-    // Parse the JSON response
-    const data = await response.json();
+    // Handle timeout or server errors
+    if (response.status === 504) {
+      throw new Error('La solicitud ha excedido el tiempo de espera. Por favor, intenta de nuevo más tarde.');
+    }
+
+    // Try to parse JSON, but handle non-JSON responses gracefully
+    let data;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (error) {
+        console.error('Error parsing JSON response:', error);
+        throw new Error('Error en el formato de respuesta del servidor');
+      }
+    } else {
+      // Handle non-JSON response
+      const text = await response.text();
+      throw new Error(`Error del servidor: ${text.substring(0, 100)}`);
+    }
 
     // If response is not ok, throw an error
     if (!response.ok) {
@@ -49,10 +67,15 @@ const fetchWithAuth = async (url, options = {}) => {
 export const authAPI = {
   // Register a new user
   register: async (userData) => {
-    return fetchWithAuth(`${API_URL}/users/register`, {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
+    try {
+      return await fetchWithAuth(`${API_URL}/users/register`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+    } catch (error) {
+      console.error('Registration error details:', error);
+      throw error;
+    }
   },
 
   // Login user
