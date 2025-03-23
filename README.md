@@ -152,3 +152,7 @@ La aplicación incluye un sistema de temas claro/oscuro que puede cambiarse manu
 
 -*Error de envío de correos*: Verifica que las credenciales de correo sean correctas y que estés usando una "contraseña de aplicación" para Gmail.
 -*Problemas de conexión a MongoDB*: Asegúrate de que la URI de conexión sea correcta y que la IP desde donde te conectas esté permitida en MongoDB Atlas.
+
+------------------------------------------
+Desarrollado con ❤️ por Miguel Gómez
+
