@@ -17,7 +17,24 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://app-task-chi.vercel.app', 'https://pp-task-chi.vercel.app', 'http://localhost:3000'],
+  origin: function(origin, callback) {
+    // Permitir solicitudes sin origen (como aplicaciones móviles o curl)
+    if (!origin) return callback(null, true);
+    
+    // Lista de dominios permitidos
+    const allowedOrigins = [
+      'https://app-task-chi.vercel.app',
+      'https://pp-task-chi.vercel.app',
+      'http://localhost:3000',
+      'https://pp-task-m2sqs0jeo-miguel-gomezs-projects-df738662.vercel.app'  // Nuevo dominio
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -58,6 +75,25 @@ if (process.env.NODE_ENV === 'production') {
     next();
   });
 }
+
+// Middleware CORS personalizado
+app.use((req, res, next) => {
+  // Obtener origen de la solicitud
+  const origin = req.headers.origin;
+  
+  // Configurar encabezados CORS para todos los orígenes
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Manejar solicitudes OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
 // Routes
 app.use('/api/users', userRoutes);
