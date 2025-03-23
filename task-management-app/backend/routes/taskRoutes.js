@@ -44,11 +44,20 @@ router.post('/', [
   try {
     const { title, description, dueDate: taskDueDate, priority } = req.body;
 
+    // Log para depuración de zona horaria
+    console.log('Fecha enviada desde frontend:', taskDueDate);
+    console.log('Fecha interpretada por backend:', new Date(taskDueDate));
+
+    // Capturar la zona horaria del usuario
+    const userTimeZone = req.body.timeZone || 'UTC';
+    console.log('Zona horaria del usuario:', userTimeZone);
+
     // Create new task
     const task = new Task({
       title,
       description,
-      dueDate: taskDueDate, // Corregido: usar taskDueDate en lugar de dueDate
+      dueDate: taskDueDate,
+      userTimeZone: userTimeZone,
       priority: priority || 'medium',
       user: req.user.id
     });
@@ -64,7 +73,7 @@ router.post('/', [
       const hoursDiff = timeDiff / (1000 * 60 * 60);
       const daysDiff = hoursDiff / 24;
       
-      // AQUÍ COLOCA LOS LOGS DE DEPURACIÓN
+      // LOGS DE DEPURACIÓN
       console.log('===== DIAGNÓSTICO DE NOTIFICACIONES =====');
       console.log('Verificando notificaciones para nueva tarea:', savedTask.title);
       console.log('ID de usuario:', req.user.id);
@@ -100,7 +109,7 @@ router.post('/', [
         const emailServiceModule = await import('../services/emailService.js');
         const emailService = emailServiceModule.default;
         
-        // Notificación para tareas que vencen en menos de 24 horas
+        // Notificación para tareas que vencen en menos de 24 horas (en el futuro)
         if (hoursDiff <= 24 && hoursDiff > 0) {
           const result = await emailService.sendTaskReminder(
             savedTask, 
@@ -108,10 +117,10 @@ router.post('/', [
             '¡Atención! Tarea por vencer en menos de 24 horas',
             `Tu tarea "${savedTask.title}" vence muy pronto (menos de 24 horas). Asegúrate de completarla a tiempo.`
           );
-          console.log(`Correo de recordatorio URGENTE enviado para tarea próxima a vencer: ${savedTask.title}`);
-          console.log('Resultado del envío de correo:', result);
+          console.log(`Correo enviado - Recordatorio URGENTE: ${savedTask.title}`);
+          console.log('Resultado del envío:', result);
         } 
-        // Notificación para tareas que vencen en menos de 7 días pero más de 24 horas
+        // Notificación para tareas que vencen entre 1 y 7 días (en el futuro)
         else if (daysDiff <= 7 && hoursDiff > 24) {
           const result = await emailService.sendTaskReminder(
             savedTask, 
@@ -119,8 +128,19 @@ router.post('/', [
             `Recordatorio: Tarea por vencer en ${Math.floor(daysDiff)} días`,
             `Tu tarea "${savedTask.title}" vence en ${Math.floor(daysDiff)} días. Te recomendamos planificar su realización.`
           );
-          console.log(`Correo de recordatorio semanal enviado para tarea: ${savedTask.title}`);
-          console.log('Resultado del envío de correo:', result);
+          console.log(`Correo enviado - Recordatorio semanal: ${savedTask.title}`);
+          console.log('Resultado del envío:', result);
+        }
+        // Tareas recién vencidas (menos de 24 horas)
+        else if (hoursDiff >= -24 && hoursDiff <= 0) {
+          const result = await emailService.sendTaskReminder(
+            savedTask, 
+            user,
+            `¡ALERTA! Tarea vencida`,
+            `Tu tarea "${savedTask.title}" ha vencido hace ${Math.abs(hoursDiff.toFixed(1))} horas. Por favor, complétala lo antes posible.`
+          );
+          console.log(`Correo enviado - Alerta de vencimiento: ${savedTask.title}`);
+          console.log('Resultado del envío:', result);
         }
       }
       console.log('===== FIN DIAGNÓSTICO =====');

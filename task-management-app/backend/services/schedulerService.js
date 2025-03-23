@@ -26,6 +26,18 @@ const schedulerService = {
       await schedulerService.sendDueTodayReminders();
     });
     
+    // Enviar notificación de tareas vencidas cada día a las 10:00 AM
+    cron.schedule('0 10 * * *', async () => {
+      console.log('Ejecutando trabajo programado: notificación de tareas vencidas');
+      await schedulerService.sendOverdueTasksReminders();
+    });
+    
+    // Enviar resumen semanal cada lunes a las 7:00 AM
+    cron.schedule('0 7 * * 1', async () => {
+      console.log('Ejecutando trabajo programado: resumen semanal (lunes)');
+      await schedulerService.sendWeeklyDigest();
+    });
+    
     console.log('Servicios de programación iniciados correctamente');
   },
   
@@ -40,11 +52,14 @@ const schedulerService = {
         'preferences.taskReminders': true
       });
       
-      console.log(`Encontradas ${subscriptions.length} suscripciones activas`);
+      console.log(`Encontradas ${subscriptions.length} suscripciones activas para recordatorios`);
       
       for (const subscription of subscriptions) {
         const user = await User.findById(subscription.user);
-        if (!user) continue;
+        if (!user) {
+          console.log(`Usuario no encontrado para la suscripción: ${subscription._id}`);
+          continue;
+        }
         
         // Buscar tareas pendientes que venzan en los próximos 2 días
         const today = new Date();
@@ -60,11 +75,13 @@ const schedulerService = {
           }
         });
         
-        console.log(`Usuario ${user.name}: ${tasks.length} tareas próximas a vencer`);
+        console.log(`Usuario ${user.name} (${user.email}): ${tasks.length} tareas próximas a vencer`);
         
         // Enviar recordatorio por cada tarea
         for (const task of tasks) {
-          await emailService.sendTaskReminder(task, user);
+          console.log(`Enviando recordatorio para tarea: ${task.title} que vence el ${new Date(task.dueDate).toLocaleString()}`);
+          const result = await emailService.sendTaskReminder(task, user);
+          console.log(`Resultado del envío: ${result.success ? 'Éxito' : 'Error'}`);
         }
       }
     } catch (error) {
@@ -113,6 +130,148 @@ const schedulerService = {
       }
     } catch (error) {
       console.error('Error al enviar recordatorios de vencimiento:', error);
+    }
+  },
+
+  /**
+   * Envía notificaciones para tareas vencidas que no han sido completadas
+   */
+  sendOverdueTasksReminders: async () => {
+    try {
+      // Buscar suscripciones activas con preferencia de alertas de vencimiento
+      const subscriptions = await NotificationSubscription.find({
+        active: true,
+        'preferences.dueDateAlerts': true
+      });
+      
+      console.log(`Buscando tareas vencidas para ${subscriptions.length} usuarios suscritos`);
+      
+      for (const subscription of subscriptions) {
+        const user = await User.findById(subscription.user);
+        if (!user) continue;
+        
+        // Buscar todas las tareas vencidas y no completadas
+        const now = new Date();
+        const overdueTasks = await Task.find({
+          user: user._id,
+          completed: false,
+          dueDate: { $lt: now }
+        }).sort({ dueDate: 1 }); // Ordenar por fecha de vencimiento (las más antiguas primero)
+        
+        if (overdueTasks.length > 0) {
+          console.log(`Usuario ${user.name}: ${overdueTasks.length} tareas vencidas`);
+          
+          // Agrupar tareas por tiempo de vencimiento
+          const recentlyOverdue = []; // Vencidas en las últimas 24 horas
+          const moderatelyOverdue = []; // Vencidas entre 1 y 3 días
+          const severelyOverdue = []; // Vencidas hace más de 3 días
+          
+          overdueTasks.forEach(task => {
+            const taskDate = new Date(task.dueDate);
+            const diffHours = (now - taskDate) / (1000 * 60 * 60);
+            
+            if (diffHours <= 24) {
+              recentlyOverdue.push(task);
+            } else if (diffHours <= 72) {
+              moderatelyOverdue.push(task);
+            } else {
+              severelyOverdue.push(task);
+            }
+          });
+          
+          // Enviar correo con todas las tareas vencidas
+          if (overdueTasks.length > 0) {
+            const emailServiceModule = await import('../services/emailService.js');
+            const emailService = emailServiceModule.default;
+            
+            await emailService.sendOverdueTasksReport(overdueTasks, user, {
+              recentlyOverdue,
+              moderatelyOverdue,
+              severelyOverdue
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error al enviar recordatorios de tareas vencidas:', error);
+    }
+  },
+
+  /**
+   * Envía un resumen semanal de tareas los lunes
+   */
+  sendWeeklyDigest: async () => {
+    try {
+      // Buscar suscripciones activas con resumen semanal habilitado
+      const subscriptions = await NotificationSubscription.find({
+        active: true,
+        'preferences.weeklyDigest': true
+      });
+      
+      console.log(`Enviando resumen semanal a ${subscriptions.length} usuarios suscritos`);
+      
+      for (const subscription of subscriptions) {
+        const user = await User.findById(subscription.user);
+        if (!user) continue;
+        
+        // Obtener fecha actual y calcular inicio/fin de semana
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        const endOfWeek = new Date(now);
+        
+        // Establecer inicio de semana (lunes)
+        startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        // Establecer fin de semana (domingo)
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        console.log(`Periodo de resumen: ${startOfWeek.toISOString()} hasta ${endOfWeek.toISOString()}`);
+        
+        // Buscar tareas para esta semana
+        const weekTasks = await Task.find({
+          user: user._id,
+          dueDate: {
+            $gte: startOfWeek,
+            $lte: endOfWeek
+          }
+        }).sort({ dueDate: 1 });
+        
+        // Buscar tareas vencidas no completadas
+        const overdueTasks = await Task.find({
+          user: user._id,
+          completed: false,
+          dueDate: { $lt: startOfWeek }
+        }).sort({ dueDate: 1 });
+        
+        // Buscar tareas completadas esta semana
+        const completedTasks = await Task.find({
+          user: user._id,
+          completed: true,
+          updatedAt: {
+            $gte: startOfWeek,
+            $lte: now
+          }
+        });
+        
+        if (weekTasks.length > 0 || overdueTasks.length > 0) {
+          console.log(`Usuario ${user.name}: Enviando resumen con ${weekTasks.length} tareas para esta semana y ${overdueTasks.length} vencidas`);
+          
+          const emailServiceModule = await import('../services/emailService.js');
+          const emailService = emailServiceModule.default;
+          
+          await emailService.sendWeeklyDigest(user, {
+            weekTasks,
+            overdueTasks,
+            completedTasks,
+            startOfWeek,
+            endOfWeek
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error al enviar resumen semanal:', error);
     }
   }
 };

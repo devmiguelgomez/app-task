@@ -14,6 +14,10 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'La fecha de vencimiento es requerida']
   },
+  userTimeZone: {
+    type: String,
+    default: 'UTC'
+  },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high'],

@@ -128,13 +128,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// Al final del archivo donde inicia el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT} en modo ${process.env.NODE_ENV}`);
   
-  // Iniciar servicios programados en producción
-  if (process.env.NODE_ENV === 'production') {
-    schedulerService.init();
-  }
+  // Iniciar servicios programados (tanto en desarrollo como en producción)
+  schedulerService.init();
+  console.log('Servicio de programación de tareas iniciado');
 });

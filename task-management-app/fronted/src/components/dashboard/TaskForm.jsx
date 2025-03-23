@@ -12,6 +12,8 @@ const TaskForm = ({ onSubmit, onCancel, initialData }) => {
     dueDate: '',
     priority: 'medium'
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // If initialData is provided (for editing), populate the form
   useEffect(() => {
@@ -32,15 +34,42 @@ const TaskForm = ({ onSubmit, onCancel, initialData }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Ensure task ID is preserved when editing
-    if (initialData && (initialData._id || initialData.id)) {
-      // Make sure we keep the original ID in the submitted data
-      const taskId = initialData._id || initialData.id;
-      onSubmit({ ...formData, _id: taskId, id: taskId });
-    } else {
-      onSubmit(formData);
+    
+    if (!formData.title || !formData.dueDate) {
+      setError('Por favor completa los campos requeridos');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setError('');
+      
+      const taskData = {
+        ...formData,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // Añadir zona horaria
+      };
+      
+      if (initialData && (initialData._id || initialData.id)) {
+        const taskId = initialData._id || initialData.id;
+        await onSubmit({ ...taskData, _id: taskId, id: taskId });
+      } else {
+        await onSubmit(taskData);
+      }
+      
+      // Clear form
+      setFormData({
+        title: '',
+        description: '',
+        dueDate: '',
+        priority: 'medium'
+      });
+      onCancel && onCancel();
+    } catch (error) {
+      setError(error.message || 'Error al guardar la tarea');
+    } finally {
+      setLoading(false);
     }
   };
 
