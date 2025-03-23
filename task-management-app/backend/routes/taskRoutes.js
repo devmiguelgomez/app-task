@@ -1,5 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
+import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
 
 import Task from '../models/Task.js';
 import { protect } from '../middleware/auth.js';
@@ -67,18 +68,30 @@ router.post('/', [
 
     // Sistema mejorado de notificaciones
     try {
-      const taskDueDateObj = new Date(savedTask.dueDate);
+      const userTimeZone = savedTask.userTimeZone || 'UTC';
       const now = new Date();
-      const timeDiff = taskDueDateObj.getTime() - now.getTime();
+      
+      // Convertir fechas a la zona horaria del usuario
+      const nowInUserTZ = zonedTimeToUtc(now, userTimeZone);
+      const taskDateInUserTZ = zonedTimeToUtc(new Date(savedTask.dueDate), userTimeZone);
+      
+      // Calcular diferencia de tiempo
+      const timeDiff = taskDateInUserTZ.getTime() - nowInUserTZ.getTime();
       const hoursDiff = timeDiff / (1000 * 60 * 60);
       const daysDiff = hoursDiff / 24;
+      
+      // Log con fechas formateadas en la zona horaria del usuario
+      console.log('Fecha actual en zona del usuario:', 
+        formatInTimeZone(now, userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
+      console.log('Fecha vencimiento en zona del usuario:', 
+        formatInTimeZone(new Date(savedTask.dueDate), userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
       
       // LOGS DE DEPURACIÓN
       console.log('===== DIAGNÓSTICO DE NOTIFICACIONES =====');
       console.log('Verificando notificaciones para nueva tarea:', savedTask.title);
       console.log('ID de usuario:', req.user.id);
       console.log('Fecha actual:', now);
-      console.log('Fecha vencimiento:', taskDueDateObj);
+      console.log('Fecha vencimiento:', taskDateInUserTZ);
       console.log('Diferencia en horas:', hoursDiff.toFixed(2));
       console.log('Diferencia en días:', daysDiff.toFixed(2));
       
