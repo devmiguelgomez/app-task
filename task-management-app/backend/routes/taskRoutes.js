@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
+import { formatInTimeZone, toDate } from 'date-fns-tz';
 
 import Task from '../models/Task.js';
 import { protect } from '../middleware/auth.js';
@@ -72,8 +72,8 @@ router.post('/', [
       const now = new Date();
       
       // Convertir fechas a la zona horaria del usuario
-      const nowInUserTZ = zonedTimeToUtc(now, userTimeZone);
-      const taskDateInUserTZ = zonedTimeToUtc(new Date(savedTask.dueDate), userTimeZone);
+      const nowInUserTZ = toDate(now, { timeZone: userTimeZone });
+      const taskDateInUserTZ = toDate(new Date(savedTask.dueDate), { timeZone: userTimeZone });
       
       // Calcular diferencia de tiempo
       const timeDiff = taskDateInUserTZ.getTime() - nowInUserTZ.getTime();
