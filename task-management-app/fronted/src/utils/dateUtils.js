@@ -15,14 +15,15 @@ export const formatTaskDate = (dateString, timezoneOffset) => {
     
     // Si tenemos offset de zona horaria, lo aplicamos
     if (timezoneOffset !== undefined) {
-      // Nota: El offset está en minutos y es positivo para zonas horarias detrás de UTC
-      // para América/Bogotá (UTC-5), el offset es 300 minutos
+      // Error crítico: Estábamos usando signo incorrecto en el ajuste
+      // Para América/Bogotá (UTC-5), el offset es 300 (positivo)
+      // Pero necesitamos añadir horas (no restar) para convertir de UTC a local
       
-      // NO aplicar ajuste basado en getTimezoneOffset del navegador
-      // Ya que la fecha en el backend ya está en UTC, y queremos mostrarla en la zona del usuario
-      
-      // Calcular el ajuste neto en milisegundos
-      const offsetAdjustmentMs = -timezoneOffset * 60 * 1000;
+      // Realizar un ajuste directo: 
+      // - Para una zona UTC-5, necesitamos AÑADIR 5 horas a la fecha UTC
+      // - El offset es positivo (300 minutos para UTC-5)
+      // - Por lo tanto multiplicamos el offset por 60000 (sin signo negativo)
+      const offsetAdjustmentMs = timezoneOffset * 60 * 1000;
       
       // Aplicar el ajuste a la fecha
       const adjustedDate = new Date(date.getTime() + offsetAdjustmentMs);
@@ -38,8 +39,7 @@ export const formatTaskDate = (dateString, timezoneOffset) => {
         hour12: false
       };
       
-      // Usar la fecha ajustada pero SIN especificar timeZone en toLocaleString
-      // para que muestre la fecha exacta que calculamos
+      // Usar la fecha ajustada sin especificar timeZone
       return adjustedDate.toLocaleString('es-ES', options);
     }
     
@@ -73,11 +73,11 @@ export const getDaysRemaining = (dateString, timezoneOffset) => {
     
     // Ajustar por zona horaria si está disponible
     if (timezoneOffset !== undefined) {
-      const serverOffset = now.getTimezoneOffset();
-      const offsetDiff = serverOffset - timezoneOffset;
+      // Corregir el ajuste: añadir el offset (no restarlo)
+      const offsetAdjustmentMs = timezoneOffset * 60 * 1000;
       
       // Ajustar la fecha de vencimiento
-      const adjustedDueDate = new Date(dueDate.getTime() + offsetDiff * 60000);
+      const adjustedDueDate = new Date(dueDate.getTime() + offsetAdjustmentMs);
       
       // Para comparar días, quitar la hora
       const todayStart = new Date(now);
