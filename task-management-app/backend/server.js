@@ -16,7 +16,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://app-task-chi.vercel.app', 'http://localhost:3000'],
+  origin: ['https://app-task-chi.vercel.app', 'https://pp-task-chi.vercel.app', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
