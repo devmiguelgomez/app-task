@@ -1,63 +1,11 @@
 import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaCheck, FaTrash, FaEdit, FaClock } from 'react-icons/fa';
+import { formatTaskDate, getDaysRemaining } from '../../utils/dateUtils';
 
 // Import CSS
 import './taskItem.css';
 
 const TaskItem = ({ task, toggleComplete, deleteTask, editTask, getPriorityColor, getPriorityIcon }) => {
-  // Función simplificada usando JavaScript nativo
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-      });
-    } catch (error) {
-      console.error('Error formateando fecha:', error);
-      return 'Fecha no disponible';
-    }
-  };
-
-  // Simplificar y corregir también getDaysRemaining
-  const getDaysRemaining = (dueDate) => {
-    try {
-      const now = new Date();
-      const taskDueDate = new Date(dueDate);
-      
-      // Normalizar fechas (quitar la parte de hora para comparar solo días)
-      const todayNormalized = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const dueDateNormalized = new Date(taskDueDate.getFullYear(), taskDueDate.getMonth(), taskDueDate.getDate());
-      
-      // Para determinar "Hoy" o "Mañana", comparamos las fechas normalizadas
-      const isTaskToday = dueDateNormalized.getTime() === todayNormalized.getTime();
-      
-      const tomorrowNormalized = new Date(todayNormalized);
-      tomorrowNormalized.setDate(tomorrowNormalized.getDate() + 1);
-      const isTaskTomorrow = dueDateNormalized.getTime() === tomorrowNormalized.getTime();
-      
-      // Para "vencida", comparamos las fechas originales
-      const isOverdue = taskDueDate < now;
-      
-      // Calcular diferencia en días
-      const diffTime = dueDateNormalized - todayNormalized;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (isOverdue) return 'Vencida';
-      if (isTaskToday) return 'Hoy';
-      if (isTaskTomorrow) return 'Mañana';
-      return `${diffDays} días`;
-    } catch (error) {
-      console.error('Error calculando días restantes:', error);
-      return "Fecha no disponible";
-    }
-  };
-
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -103,30 +51,23 @@ const TaskItem = ({ task, toggleComplete, deleteTask, editTask, getPriorityColor
           </div>
         </div>
         
-        <p className={`task-description ${task.completed ? 'completed' : ''}`}>
-          {task.description}
-        </p>
+        {task.description && (
+          <p className="task-description">{task.description}</p>
+        )}
         
         <div className="task-metadata">
-          <div className="task-metadata-item priority">
-            {getPriorityIcon(task.priority)}
-            <span className={`task-metadata-text ${task.completed ? 'completed' : ''}`}>
-              Prioridad {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Baja'}
-            </span>
-          </div>
-          
-          <div className="task-metadata-item date">
-            <FaCalendarAlt className={`task-metadata-icon date ${task.completed ? 'completed' : ''}`} />
-            <span className={`task-metadata-text ${task.completed ? 'completed' : ''}`}>
-              {formatDate(task.dueDate)}
+          <div className="task-metadata-item">
+            <FaCalendarAlt className="task-metadata-icon" />
+            <span className="task-metadata-text">
+              {formatTaskDate(task.dueDate, task.timezoneOffset)}
             </span>
           </div>
           
           {!task.completed && (
-            <div className="task-metadata-item deadline">
+            <div className="task-metadata-item">
               <FaClock className="task-metadata-icon deadline" />
               <span className="task-metadata-text deadline">
-                {getDaysRemaining(task.dueDate)}
+                {getDaysRemaining(task.dueDate, task.timezoneOffset)}
               </span>
             </div>
           )}
