@@ -2,61 +2,47 @@
 
 const API_URL = 'https://app-task-backend.vercel.app/api'; // Update this if necessary
 
+// Función para manejar errores de API de forma más robusta
+const handleApiResponse = async (response) => {
+  if (!response.ok) {
+    // Para errores 404, mostrar un mensaje más amigable
+    if (response.status === 404) {
+      throw new Error("El recurso solicitado no se encuentra disponible. Es posible que el servidor esté en mantenimiento.");
+    }
+    
+    // Intentar parsear el error como JSON
+    try {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error del servidor: ${response.statusText}`);
+    } catch (e) {
+      // Si no puede parsear JSON, usar el texto del status
+      throw new Error(`Error del servidor: ${response.statusText}`);
+    }
+  }
+  
+  return response.json();
+};
+
 // Helper function to handle fetch requests
 const fetchWithAuth = async (url, options = {}) => {
-  // Get token from localStorage
   const token = localStorage.getItem('token');
   
-  // Set headers with authorization if token exists
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (!token) {
+    throw new Error('No hay sesión activa');
   }
-
-  // Make the request
+  
+  const fetchOptions = {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers
+    }
+  };
+  
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      // Remove credentials: 'include' as it might be causing issues with CORS
-    });
-
-    // Handle OPTIONS preflight response
-    if (response.status === 204) {
-      return { success: true };
-    }
-
-    // Handle timeout or server errors
-    if (response.status === 504) {
-      throw new Error('La solicitud ha excedido el tiempo de espera. Por favor, intenta de nuevo más tarde.');
-    }
-
-    // Try to parse JSON, but handle non-JSON responses gracefully
-    let data;
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      try {
-        data = await response.json();
-      } catch (error) {
-        console.error('Error parsing JSON response:', error);
-        throw new Error('Error en el formato de respuesta del servidor');
-      }
-    } else {
-      // Handle non-JSON response
-      const text = await response.text();
-      throw new Error(`Error del servidor: ${text.substring(0, 100)}`);
-    }
-
-    // If response is not ok, throw an error
-    if (!response.ok) {
-      throw new Error(data.error || 'Algo salió mal');
-    }
-
-    return data;
+    const response = await fetch(url, fetchOptions);
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('API request error:', error);
     throw error;

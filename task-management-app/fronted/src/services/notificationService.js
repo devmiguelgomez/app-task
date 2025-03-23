@@ -170,7 +170,7 @@ const notificationService = {
       
       // Call the API service to subscribe
       const { tasksAPI } = await import('./api');
-      return tasksAPI.subscribeToNotifications({
+      return await tasksAPI.subscribeToNotifications({
         email: user.email,
         preferences: {
           taskReminders: preferences.taskReminders || true,

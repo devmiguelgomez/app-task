@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaPlus, FaCalendarAlt, FaExclamationCircle, FaCheck, FaClock, FaTrash, FaEdit, FaSignOutAlt, FaBell, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 // Task components
 import TaskForm from './TaskForm';
