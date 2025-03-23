@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 import Task from '../models/Task.js';
 import { protect } from '../middleware/auth.js';
+import User from '../models/User.js'; // Añade esta importación
 
 const router = express.Router();
 
