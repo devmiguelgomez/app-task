@@ -16,6 +16,9 @@ import notificationService from '../../services/notificationService';
 // Import CSS
 import './dashboard.css';
 
+// Import ThemeToggle component
+import ThemeToggle from '../common/ThemeToggle';
+
 const Dashboard = () => {
   const navigate = useNavigate();
   // State for tasks and modal
@@ -280,6 +283,7 @@ const Dashboard = () => {
             {error && <p className="dashboard-error">{error}</p>}
           </div>
           <div className="dashboard-actions">
+            <ThemeToggle />
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

@@ -1,11 +1,11 @@
 /* TaskItem Component Styles */
 
 .task-item {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   transition: box-shadow 0.3s;
   height: 100%;
   display: flex;
@@ -13,7 +13,7 @@
 }
 
 .task-item:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-lg);
 }
 
 .task-item.completed {
@@ -58,12 +58,12 @@
 .task-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .task-title.completed {
   text-decoration: line-through;
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 .task-actions {
@@ -112,11 +112,11 @@
 .task-description {
   font-size: 0.875rem;
   margin-bottom: 1rem;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .task-description.completed {
-  color: #9ca3af;
+  color: var(--text-tertiary);
 }
 
 .task-metadata {
@@ -179,11 +179,11 @@
 }
 
 .task-metadata-text {
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .task-metadata-text.completed {
-  color: #9ca3af;
+  color: var(--text-tertiary);
 }
 
 .task-metadata-text.deadline {
