@@ -8,7 +8,8 @@ const ThemeToggle = () => {
   );
 
   useEffect(() => {
-    // Aplicar tema inicial
+    // Aplicar tema inicial a toda la página, no solo al body
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
     document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
@@ -19,7 +20,8 @@ const ThemeToggle = () => {
     // Guardar preferencia en localStorage
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
     
-    // Aplicar tema al body
+    // Aplicar tema al documento entero Y al body
+    document.documentElement.setAttribute('data-theme', newMode ? 'dark' : 'light');
     document.body.setAttribute('data-theme', newMode ? 'dark' : 'light');
   };
 
@@ -29,7 +31,7 @@ const ThemeToggle = () => {
       onClick={toggleTheme}
       aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
     >
-      {isDarkMode ? <FaSun /> : <FaMoon />}
+      {isDarkMode ? <FaSun className="theme-icon sun" /> : <FaMoon className="theme-icon moon" />}
     </button>
   );
 };

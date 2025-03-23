@@ -1,7 +1,7 @@
 /* TaskItem Component Styles */
 
 .task-item {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -10,6 +10,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  color: var(--text-primary);
 }
 
 .task-item:hover {
@@ -82,10 +83,15 @@
   border-radius: 9999px;
   transition: all 0.3s;
   padding: 0.625rem;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .task-action-button:hover {
   transform: scale(1.1);
+  background-color: var(--accent-color);
+  color: var(--button-text);
 }
 
 .task-action-button:active {
@@ -94,7 +100,7 @@
 
 .task-action-button.complete {
   background-color: #f3f4f6;
-  color: #4b5563;
+  color: var(--success-color);
 }
 
 .task-action-button.complete.is-completed {
@@ -102,18 +108,30 @@
   color: #059669;
 }
 
+.task-action-button.complete:hover {
+  background-color: var(--success-color);
+  color: white;
+}
+
 .task-action-button.edit {
   background-color: #dbeafe;
-  color: #2563eb;
+  color: var(--warning-color);
+}
+
+.task-action-button.edit:hover {
+  background-color: var(--warning-color);
+  color: white;
 }
 
 .task-action-button.delete {
   background-color: #fee2e2;
-  color: #dc2626;
+  color: var(--error-color);
 }
 
-.task-action-button:hover {
+.task-action-button.delete:hover {
   background-opacity: 0.8;
+  background-color: var(--error-color);
+  color: white;
 }
 
 .task-description {
@@ -155,6 +173,8 @@
 
 .task-metadata-icon {
   margin-right: 0.5rem;
+  color: var(--text-secondary);
+  fill: var(--text-secondary);
 }
 
 .task-metadata-icon.priority-high {
@@ -212,5 +232,78 @@
   
   .task-title {
     font-size: 1.25rem;
+  }
+}
+
+/* Mejoras para móvil */
+@media (max-width: 767px) {
+  .task-item {
+    padding: 1rem;
+  }
+  
+  .task-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .task-description {
+    font-size: 0.9rem;
+  }
+  
+  .task-metadata {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .task-metadata-item {
+    margin-right: 0;
+  }
+  
+  .task-action-button {
+    padding: 0.6rem;
+  }
+}
+
+/* Mejorar visualización móvil */
+@media (max-width: 768px) {
+  .task-item {
+    padding: 0.75rem;
+  }
+  
+  .task-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .task-actions {
+    margin-top: 0.5rem;
+    align-self: flex-end;
+  }
+  
+  .task-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+  }
+  
+  .task-description {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .task-metadata {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .task-metadata-item {
+    margin-right: 0;
+  }
+  
+  .task-action-button {
+    width: 2rem;
+    height: 2rem;
   }
 }

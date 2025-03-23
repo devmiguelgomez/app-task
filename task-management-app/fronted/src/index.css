@@ -5,6 +5,55 @@
   color-scheme: light dark;
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  /* Colores base - Tema claro */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --error-color: #ef4444;
+  --success-color: #22c55e;
+  --warning-color: #f59e0b;
+  --button-text: #ffffff;
+  --icon-color: #64748b;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --task-hover: #f8fafc;
+  --priority-high: #ef4444;
+  --priority-medium: #f59e0b;
+  --priority-low: #22c55e;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Tema oscuro */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --border-color: #334155;
+  --accent-color: #3b82f6;
+  --accent-hover: #60a5fa;
+  --error-color: #f87171;
+  --success-color: #4ade80;
+  --warning-color: #fbbf24;
+  --button-text: #ffffff;
+  --icon-color: #cbd5e1;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --task-hover: #273549;
+  --priority-high: #f87171;
+  --priority-medium: #fbbf24;
+  --priority-low: #4ade80;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -14,6 +63,8 @@ body {
   overflow-x: hidden; /* Prevenir scroll horizontal */
   -webkit-text-size-adjust: 100%; /* Prevenir zoom en formularios en iOS */
   touch-action: manipulation; /* Mejorar rendimiento táctil */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 h1 {
@@ -44,6 +95,58 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Aplicar colores de tema a los botones e iconos */
+button, 
+.btn {
+  background-color: var(--accent-color);
+  color: var(--button-text);
+}
+
+button:hover, 
+.btn:hover {
+  background-color: var(--accent-hover);
+}
+
+button.delete, 
+button.delete:hover,
+.btn.delete, 
+.btn.delete:hover {
+  background-color: var(--error-color);
+}
+
+button.success, 
+button.success:hover,
+.btn.success, 
+.btn.success:hover {
+  background-color: var(--success-color);
+}
+
+button.warning, 
+button.warning:hover,
+.btn.warning, 
+.btn.warning:hover {
+  background-color: var(--warning-color);
+}
+
+/* Aplicar color a los iconos */
+svg {
+  fill: var(--icon-color);
+}
+
+svg:not([class*="priority-"]):not([class*="theme-icon"]) {
+  color: var(--text-secondary);
+  fill: var(--text-secondary);
+}
+
+/* Formularios */
+input, 
+select, 
+textarea {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
 /* Utility classes */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -71,5 +174,84 @@ button:focus-visible {
   
   h3 {
     font-size: 1.25em;
+  }
+}
+
+/* Para arreglar el problema de modo móvil */
+@media (max-width: 767px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .tasks-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .dashboard-actions {
+    width: 100%;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .dashboard-filters {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .new-task-button, 
+  .filter-button, 
+  .search-input {
+    width: 100%;
+  }
+  
+  .task-item {
+    flex-direction: column;
+  }
+  
+  .task-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .task-actions {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+  
+  .modal-content {
+    width: 90%;
+    padding: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mejoras generales responsivas */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
   }
 }

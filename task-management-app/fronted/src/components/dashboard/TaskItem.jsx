@@ -21,33 +21,31 @@ const TaskItem = ({ task, toggleComplete, deleteTask, editTask, getPriorityColor
             {task.title}
           </h3>
           <div className="task-actions">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => toggleComplete(task._id || task.id)}
-              className={`task-action-button complete ${task.completed ? 'is-completed' : ''}`}
-              title={task.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
-            >
-              <FaCheck />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            {!task.completed && (
+              <button 
+                onClick={() => toggleComplete(task._id)}
+                className="task-action-button complete"
+                title="Marcar como completada"
+              >
+                <FaCheck />
+              </button>
+            )}
+            
+            <button 
               onClick={() => editTask(task)}
               className="task-action-button edit"
               title="Editar tarea"
             >
               <FaEdit />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => deleteTask(task._id || task.id)}
+            </button>
+            
+            <button 
+              onClick={() => deleteTask(task._id)}
               className="task-action-button delete"
               title="Eliminar tarea"
             >
               <FaTrash />
-            </motion.button>
+            </button>
           </div>
         </div>
         
