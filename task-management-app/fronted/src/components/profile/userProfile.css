@@ -1,0 +1,195 @@
+.profile-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile-card {
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.profile-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.profile-section {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.5rem;
+}
+
+.profile-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.section-icon {
+  margin-right: 0.5rem;
+  color: var(--primary-color);
+}
+
+.user-info p {
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.notification-toggles,
+.preferences-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notification-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.notification-option h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.notification-option p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.toggle-button {
+  background-color: var(--bg-tertiary);
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.toggle-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.toggle-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.preference-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.preference-item input[type="checkbox"] {
+  accent-color: var(--primary-color);
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.preference-item h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.preference-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.save-button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.profile-error {
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.profile-message {
+  background-color: #ecfdf5;
+  color: #10b981;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  
+  .notification-option {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .notification-option button {
+    align-self: flex-start;
+  }
+}

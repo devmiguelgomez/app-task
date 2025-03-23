@@ -6,20 +6,46 @@
 const notificationService = {
   /**
    * Request permission for browser notifications
-   * @returns {Promise<boolean>} - Whether permission was granted
+   * @returns {Promise<object>} - Status and message about notification permissions
    */
   requestNotificationPermission: async () => {
     if (!('Notification' in window)) {
-      console.error('Este navegador no soporta notificaciones de escritorio');
-      return false;
+      return { 
+        granted: false, 
+        status: 'unsupported',
+        message: 'Este navegador no soporta notificaciones de escritorio' 
+      };
     }
     
     try {
+      // Comprobar primero si los permisos ya están definidos
+      if (Notification.permission === 'denied') {
+        return { 
+          granted: false, 
+          status: 'blocked',
+          message: 'Las notificaciones han sido bloqueadas. Para habilitarlas, haz clic en el icono de ajustes junto a la URL y modifica los permisos del sitio.' 
+        };
+      }
+      
+      if (Notification.permission === 'granted') {
+        return { granted: true, status: 'granted', message: 'Notificaciones ya habilitadas' };
+      }
+      
       const permission = await Notification.requestPermission();
-      return permission === 'granted';
+      return { 
+        granted: permission === 'granted', 
+        status: permission,
+        message: permission === 'granted' 
+          ? 'Notificaciones habilitadas correctamente' 
+          : 'Notificaciones deshabilitadas por el usuario'
+      };
     } catch (error) {
       console.error('Error al solicitar permisos de notificación:', error);
-      return false;
+      return { 
+        granted: false, 
+        status: 'error',
+        message: 'Error al solicitar permisos de notificación' 
+      };
     }
   },
   

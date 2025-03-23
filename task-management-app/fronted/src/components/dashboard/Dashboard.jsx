@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaPlus, FaCalendarAlt, FaExclamationCircle, FaCheck, FaClock, FaTrash, FaEdit, FaSignOutAlt, FaBell } from 'react-icons/fa';
+import { FaPlus, FaCalendarAlt, FaExclamationCircle, FaCheck, FaClock, FaTrash, FaEdit, FaSignOutAlt, FaBell, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 // Task components
@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState('');
 
   // Logout function
   const handleLogout = () => {
@@ -43,8 +45,10 @@ const Dashboard = () => {
   // Request notification permissions
   useEffect(() => {
     const requestPermissions = async () => {
-      const permissionGranted = await notificationService.requestNotificationPermission();
-      setNotificationsEnabled(permissionGranted);
+      const result = await notificationService.requestNotificationPermission();
+      setNotificationsEnabled(result.granted);
+      setNotificationStatus(result.status);
+      setNotificationMessage(result.message);
     };
     
     requestPermissions();
@@ -281,17 +285,39 @@ const Dashboard = () => {
             <h1 className="dashboard-title">Mi Panel de Tareas</h1>
             <p className="dashboard-subtitle">Organiza tus actividades y mejora tu productividad</p>
             {error && <p className="dashboard-error">{error}</p>}
+            
+            {/* Mensaje de estado de notificaciones */}
+            {notificationStatus === 'blocked' && (
+              <div className="notification-alert">
+                <p>
+                  <FaBell style={{ marginRight: '8px' }} />
+                  {notificationMessage}
+                </p>
+              </div>
+            )}
           </div>
+          
           <div className="dashboard-actions">
             <ThemeToggle />
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/profile')}
+              className="profile-button"
+            >
+              <FaUser /> Perfil
+            </motion.button>
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               className="logout-button"
             >
-              <FaSignOutAlt className="mr-2" /> Cerrar Sesión
+              <FaSignOutAlt /> Salir
             </motion.button>
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -312,6 +338,14 @@ const Dashboard = () => {
             >
               <FaPlus className="mr-2" /> Nueva Tarea
             </motion.button>
+            {/* Botón para activar notificaciones (añadir a la interfaz) */}
+            <button 
+              onClick={requestPermissions} 
+              className="notification-btn"
+              disabled={notificationStatus === 'blocked' || notificationsEnabled}
+            >
+              {notificationsEnabled ? 'Notificaciones activas' : 'Activar notificaciones'}
+            </button>
           </div>
         </div>
 

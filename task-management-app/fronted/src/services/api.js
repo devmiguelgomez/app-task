@@ -152,6 +152,11 @@ export const tasksAPI = {
     });
   },
 
+  // Get notification preferences
+  getNotificationPreferences: async () => {
+    return fetchWithAuth(`${API_URL}/tasks/notifications/preferences`);
+  },
+
   // Create a new task
   createTask: async (taskData) => {
     return fetchWithAuth(`${API_URL}/tasks`, {

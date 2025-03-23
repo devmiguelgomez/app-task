@@ -359,4 +359,36 @@ router.post('/notifications/unsubscribe', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/tasks/notifications/preferences
+// @desc    Get user's notification preferences
+// @access  Private
+router.get('/notifications/preferences', protect, async (req, res) => {
+  try {
+    const NotificationSubscription = (await import('../models/NotificationSubscription.js')).default;
+    
+    const subscription = await NotificationSubscription.findOne({
+      user: req.user.id,
+      active: true
+    });
+    
+    if (!subscription) {
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron preferencias de notificación'
+      });
+    }
+    
+    res.json({
+      success: true,
+      subscription
+    });
+  } catch (error) {
+    console.error('Error getting notification preferences:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener preferencias de notificación'
+    });
+  }
+});
+
 export default router;

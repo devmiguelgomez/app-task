@@ -7,6 +7,7 @@ import Login from './components/auth/Login'
 import Register from './components/auth/Register'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Dashboard from './components/dashboard/Dashboard'
+import UserProfile from './components/profile/UserProfile'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +53,11 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <UserProfile />
           </ProtectedRoute>
         } />
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
