@@ -18,9 +18,29 @@ const TaskForm = ({ onSubmit, onCancel, initialData }) => {
   // If initialData is provided (for editing), populate the form
   useEffect(() => {
     if (initialData) {
-      // Format the date to be compatible with the date input
-      const formattedDate = initialData.dueDate ? 
-        new Date(initialData.dueDate).toISOString().slice(0, 16) : '';
+      // Obtener la zona horaria del usuario
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      // Formatear la fecha considerando la zona horaria
+      let formattedDate = '';
+      if (initialData.dueDate) {
+        try {
+          // Convertir fecha a formato requerido por input datetime-local
+          const date = new Date(initialData.dueDate);
+          
+          // Asegurarse de que la fecha se maneje en la zona horaria local
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          
+          formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+        } catch (e) {
+          console.error('Error formateando fecha:', e);
+          formattedDate = '';
+        }
+      }
       
       setFormData({
         ...initialData,
