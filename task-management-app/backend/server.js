@@ -51,6 +51,14 @@ mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected');
 });
 
+// Middleware para depurar rutas en producción
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+  });
+}
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -62,6 +70,16 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'Welcome to Task Management API',
     mongoDBStatus: dbStatus
+  });
+});
+
+// Ruta de verificación para comprobar si la API está funcionando
+app.get('/api/status', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'API running',
+    environment: process.env.NODE_ENV,
+    mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
