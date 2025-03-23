@@ -449,7 +449,10 @@ router.post('/send-test-email', protect, async (req, res) => {
       status: 'pending'
     };
     
-    const emailService = require('../services/emailService');
+    // Usar importación dinámica en lugar de require
+    const emailServiceModule = await import('../services/emailService.js');
+    const emailService = emailServiceModule.default;
+    
     const result = await emailService.sendTaskReminder(testTask, user);
     
     if (result.success) {
