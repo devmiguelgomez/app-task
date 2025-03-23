@@ -18,6 +18,10 @@ const taskSchema = new mongoose.Schema({
     type: String,
     default: 'UTC'
   },
+  timezoneOffset: {
+    type: Number,
+    default: 0 // Offset en minutos
+  },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high'],

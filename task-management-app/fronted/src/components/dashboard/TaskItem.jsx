@@ -1,58 +1,59 @@
 import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaCheck, FaTrash, FaEdit, FaClock } from 'react-icons/fa';
-import { format, isToday, isTomorrow } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { formatInTimeZone } from 'date-fns-tz';
 
 // Import CSS
 import './taskItem.css';
 
 const TaskItem = ({ task, toggleComplete, deleteTask, editTask, getPriorityColor, getPriorityIcon }) => {
-  // Format date to a more readable format
+  // Función simplificada usando JavaScript nativo
   const formatDate = (dateString) => {
     try {
-      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit'
-      };
-      
-      // Usar formatInTimeZone para formatear la fecha en la zona horaria del usuario
-      return formatInTimeZone(
-        new Date(dateString), 
-        userTimeZone, 
-        'dd MMM yyyy, HH:mm', 
-        { locale: es }
-      );
+      const date = new Date(dateString);
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      });
     } catch (error) {
-      // Fallback por si hay algún error
-      return new Date(dateString).toLocaleString('es-ES');
+      console.error('Error formateando fecha:', error);
+      return 'Fecha no disponible';
     }
   };
 
-  // Calculate days remaining
+  // Simplificar y corregir también getDaysRemaining
   const getDaysRemaining = (dueDate) => {
     try {
-      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const today = new Date();
+      const now = new Date();
       const taskDueDate = new Date(dueDate);
       
-      // Ajustar las fechas a la zona horaria del usuario
-      const todayInUserTZ = new Date(formatInTimeZone(today, userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
-      const dueDateInUserTZ = new Date(formatInTimeZone(taskDueDate, userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
+      // Normalizar fechas (quitar la parte de hora para comparar solo días)
+      const todayNormalized = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dueDateNormalized = new Date(taskDueDate.getFullYear(), taskDueDate.getMonth(), taskDueDate.getDate());
       
-      const diffTime = dueDateInUserTZ - todayInUserTZ;
+      // Para determinar "Hoy" o "Mañana", comparamos las fechas normalizadas
+      const isTaskToday = dueDateNormalized.getTime() === todayNormalized.getTime();
+      
+      const tomorrowNormalized = new Date(todayNormalized);
+      tomorrowNormalized.setDate(tomorrowNormalized.getDate() + 1);
+      const isTaskTomorrow = dueDateNormalized.getTime() === tomorrowNormalized.getTime();
+      
+      // Para "vencida", comparamos las fechas originales
+      const isOverdue = taskDueDate < now;
+      
+      // Calcular diferencia en días
+      const diffTime = dueDateNormalized - todayNormalized;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
-      if (diffDays < 0) return 'Vencida';
-      if (isToday(dueDateInUserTZ)) return 'Hoy';
-      if (isTomorrow(dueDateInUserTZ)) return 'Mañana';
+      if (isOverdue) return 'Vencida';
+      if (isTaskToday) return 'Hoy';
+      if (isTaskTomorrow) return 'Mañana';
       return `${diffDays} días`;
     } catch (error) {
-      // Fallback
+      console.error('Error calculando días restantes:', error);
       return "Fecha no disponible";
     }
   };

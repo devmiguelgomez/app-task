@@ -43,22 +43,20 @@ router.post('/', [
   }
 
   try {
-    const { title, description, dueDate: taskDueDate, priority } = req.body;
+    const { title, description, dueDate: taskDueDate, priority, timeZone, timezoneOffset } = req.body;
 
     // Log para depuración de zona horaria
     console.log('Fecha enviada desde frontend:', taskDueDate);
-    console.log('Fecha interpretada por backend:', new Date(taskDueDate));
-
-    // Capturar la zona horaria del usuario
-    const userTimeZone = req.body.timeZone || 'UTC';
-    console.log('Zona horaria del usuario:', userTimeZone);
+    console.log('Zona horaria del usuario:', timeZone);
+    console.log('Offset de zona horaria en minutos:', timezoneOffset);
 
     // Create new task
     const task = new Task({
       title,
       description,
       dueDate: taskDueDate,
-      userTimeZone: userTimeZone,
+      userTimeZone: timeZone || 'UTC',
+      timezoneOffset: timezoneOffset || 0,
       priority: priority || 'medium',
       user: req.user.id
     });
@@ -66,36 +64,38 @@ router.post('/', [
     // Save task to database
     const savedTask = await task.save();
 
-    // Sistema mejorado de notificaciones
+    // Diagnóstico y sistema de notificaciones
     try {
-      const userTimeZone = savedTask.userTimeZone || 'UTC';
+      // Crear fechas ajustadas correctamente para la zona horaria del usuario
       const now = new Date();
+      const taskDueDateObj = new Date(savedTask.dueDate);
       
-      // Convertir fechas a la zona horaria del usuario
-      const nowInUserTZ = toDate(now, { timeZone: userTimeZone });
-      const taskDateInUserTZ = toDate(new Date(savedTask.dueDate), { timeZone: userTimeZone });
+      // Ajustar la fecha actual a la zona horaria del usuario
+      const userOffsetMs = (savedTask.timezoneOffset || 0) * 60 * 1000;
+      const serverOffsetMs = now.getTimezoneOffset() * 60 * 1000;
+      const offsetDiff = serverOffsetMs - userOffsetMs;
       
-      // Calcular diferencia de tiempo
+      // Fechas ajustadas
+      const nowInUserTZ = new Date(now.getTime() + offsetDiff);
+      const taskDateInUserTZ = new Date(taskDueDateObj.getTime());
+      
+      // Calcular diferencia real entre fechas
       const timeDiff = taskDateInUserTZ.getTime() - nowInUserTZ.getTime();
       const hoursDiff = timeDiff / (1000 * 60 * 60);
       const daysDiff = hoursDiff / 24;
-      
-      // Log con fechas formateadas en la zona horaria del usuario
-      console.log('Fecha actual en zona del usuario:', 
-        formatInTimeZone(now, userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
-      console.log('Fecha vencimiento en zona del usuario:', 
-        formatInTimeZone(new Date(savedTask.dueDate), userTimeZone, 'yyyy-MM-dd HH:mm:ss'));
       
       // LOGS DE DEPURACIÓN
       console.log('===== DIAGNÓSTICO DE NOTIFICACIONES =====');
       console.log('Verificando notificaciones para nueva tarea:', savedTask.title);
       console.log('ID de usuario:', req.user.id);
-      console.log('Fecha actual:', now);
-      console.log('Fecha vencimiento:', taskDateInUserTZ);
-      console.log('Diferencia en horas:', hoursDiff.toFixed(2));
-      console.log('Diferencia en días:', daysDiff.toFixed(2));
+      console.log('Fecha actual en servidor (UTC):', now);
+      console.log('Fecha actual ajustada a zona usuario:', nowInUserTZ);
+      console.log('Fecha vencimiento (UTC):', taskDueDateObj);
+      console.log('Fecha vencimiento para usuario:', taskDateInUserTZ);
+      console.log('Diferencia en horas (ajustada):', hoursDiff.toFixed(2));
+      console.log('Diferencia en días (ajustada):', daysDiff.toFixed(2));
       
-      // Buscar si el usuario tiene suscripción activa
+      // El resto del código para notificaciones permanece igual
       const NotificationSubscription = (await import('../models/NotificationSubscription.js')).default;
       const subscription = await NotificationSubscription.findOne({
         user: req.user.id,

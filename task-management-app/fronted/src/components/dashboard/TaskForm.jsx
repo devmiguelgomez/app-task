@@ -18,24 +18,14 @@ const TaskForm = ({ onSubmit, onCancel, initialData }) => {
   // If initialData is provided (for editing), populate the form
   useEffect(() => {
     if (initialData) {
-      // Obtener la zona horaria del usuario
-      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
-      // Formatear la fecha considerando la zona horaria
       let formattedDate = '';
       if (initialData.dueDate) {
         try {
           // Convertir fecha a formato requerido por input datetime-local
           const date = new Date(initialData.dueDate);
           
-          // Asegurarse de que la fecha se maneje en la zona horaria local
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          
-          formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+          // Formato YYYY-MM-DDThh:mm (sin segundos)
+          formattedDate = date.toISOString().substring(0, 16);
         } catch (e) {
           console.error('Error formateando fecha:', e);
           formattedDate = '';
@@ -66,9 +56,14 @@ const TaskForm = ({ onSubmit, onCancel, initialData }) => {
       setLoading(true);
       setError('');
       
+      // Obtener offset de zona horaria para incluirlo explícitamente
+      const dateObj = new Date(formData.dueDate);
+      const userTimezoneOffset = dateObj.getTimezoneOffset();
+      
       const taskData = {
         ...formData,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // Añadir zona horaria
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezoneOffset: userTimezoneOffset
       };
       
       if (initialData && (initialData._id || initialData.id)) {

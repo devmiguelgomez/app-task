@@ -77,9 +77,16 @@ const schedulerService = {
         
         console.log(`Usuario ${user.name} (${user.email}): ${tasks.length} tareas próximas a vencer`);
         
-        // Enviar recordatorio por cada tarea
+        // Enviar recordatorio por cada tarea con ajuste de zona horaria
         for (const task of tasks) {
-          console.log(`Enviando recordatorio para tarea: ${task.title} que vence el ${new Date(task.dueDate).toLocaleString()}`);
+          // Ajustar la fecha según la zona horaria del usuario para el mensaje
+          const dueDate = new Date(task.dueDate);
+          const userOffsetMs = (task.timezoneOffset || 0) * 60 * 1000;
+          const serverOffsetMs = dueDate.getTimezoneOffset() * 60 * 1000;
+          const offsetDiff = serverOffsetMs - userOffsetMs;
+          const userAdjustedDate = new Date(dueDate.getTime() + offsetDiff);
+          
+          console.log(`Enviando recordatorio para tarea: ${task.title} que vence el ${userAdjustedDate.toLocaleString()} (hora local del usuario)`);
           const result = await emailService.sendTaskReminder(task, user);
           console.log(`Resultado del envío: ${result.success ? 'Éxito' : 'Error'}`);
         }
