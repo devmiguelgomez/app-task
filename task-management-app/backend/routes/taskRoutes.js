@@ -64,6 +64,15 @@ router.post('/', [
       const hoursDiff = timeDiff / (1000 * 60 * 60);
       const daysDiff = hoursDiff / 24;
       
+      // AQUÍ COLOCA LOS LOGS DE DEPURACIÓN
+      console.log('===== DIAGNÓSTICO DE NOTIFICACIONES =====');
+      console.log('Verificando notificaciones para nueva tarea:', savedTask.title);
+      console.log('ID de usuario:', req.user.id);
+      console.log('Fecha actual:', now);
+      console.log('Fecha vencimiento:', taskDueDateObj);
+      console.log('Diferencia en horas:', hoursDiff.toFixed(2));
+      console.log('Diferencia en días:', daysDiff.toFixed(2));
+      
       // Buscar si el usuario tiene suscripción activa
       const NotificationSubscription = (await import('../models/NotificationSubscription.js')).default;
       const subscription = await NotificationSubscription.findOne({
@@ -72,6 +81,20 @@ router.post('/', [
         'preferences.taskReminders': true
       });
       
+      console.log('Suscripción encontrada:', subscription ? 'Sí' : 'No');
+      if (!subscription) {
+        console.log('Razón sin suscripción: Usuario no ha activado notificaciones o preferencias');
+        // Imprime detalles de cualquier suscripción existente para este usuario
+        const anySubscription = await NotificationSubscription.findOne({user: req.user.id});
+        console.log('¿Existe alguna suscripción?', anySubscription ? 'Sí' : 'No');
+        if (anySubscription) {
+          console.log('Estado de la suscripción:', {
+            active: anySubscription.active, 
+            taskReminders: anySubscription.preferences?.taskReminders
+          });
+        }
+      }
+      
       if (subscription) {
         const user = await User.findById(req.user.id);
         const emailServiceModule = await import('../services/emailService.js');
@@ -79,28 +102,30 @@ router.post('/', [
         
         // Notificación para tareas que vencen en menos de 24 horas
         if (hoursDiff <= 24 && hoursDiff > 0) {
-          await emailService.sendTaskReminder(
+          const result = await emailService.sendTaskReminder(
             savedTask, 
             user, 
             '¡Atención! Tarea por vencer en menos de 24 horas',
             `Tu tarea "${savedTask.title}" vence muy pronto (menos de 24 horas). Asegúrate de completarla a tiempo.`
           );
           console.log(`Correo de recordatorio URGENTE enviado para tarea próxima a vencer: ${savedTask.title}`);
+          console.log('Resultado del envío de correo:', result);
         } 
         // Notificación para tareas que vencen en menos de 7 días pero más de 24 horas
         else if (daysDiff <= 7 && hoursDiff > 24) {
-          await emailService.sendTaskReminder(
+          const result = await emailService.sendTaskReminder(
             savedTask, 
             user,
             `Recordatorio: Tarea por vencer en ${Math.floor(daysDiff)} días`,
             `Tu tarea "${savedTask.title}" vence en ${Math.floor(daysDiff)} días. Te recomendamos planificar su realización.`
           );
           console.log(`Correo de recordatorio semanal enviado para tarea: ${savedTask.title}`);
+          console.log('Resultado del envío de correo:', result);
         }
       }
+      console.log('===== FIN DIAGNÓSTICO =====');
     } catch (error) {
-      console.error('Error al enviar recordatorio inmediato:', error);
-      // No interrumpimos la respuesta si falla el envío de correo
+      console.error('Error al intentar enviar notificación:', error);
     }
 
     res.status(201).json({
