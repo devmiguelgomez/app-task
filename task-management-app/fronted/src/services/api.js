@@ -68,10 +68,21 @@ export const authAPI = {
   // Register a new user
   register: async (userData) => {
     try {
-      return await fetchWithAuth(`${API_URL}/users/register`, {
+      const response = await fetch(`${API_URL}/users/register`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(userData),
       });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || data.errors?.[0]?.msg || 'Error en el registro');
+      }
+      
+      return data;
     } catch (error) {
       console.error('Registration error details:', error);
       throw error;
