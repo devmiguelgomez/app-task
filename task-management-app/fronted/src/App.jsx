@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
@@ -11,22 +11,21 @@ import ForgotPassword from './components/auth/ForgotPassword'
 import Dashboard from './components/dashboard/Dashboard'
 import UserProfile from './components/profile/UserProfile'
 
-// Protected Route Component
+// Modificar el componente ProtectedRoute para que funcione correctamente
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token')
-  const location = useLocation()
+  const token = localStorage.getItem('token');
+  const location = useLocation();
   
   if (!token) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  return children
-}
+  return children;
+};
 
 function App() {
   // Check for token to determine authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   
   // Update authentication state when token changes
   useEffect(() => {
@@ -77,6 +76,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
     </Router>
   )

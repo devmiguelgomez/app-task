@@ -1,10 +1,14 @@
-// Modifica la URL base de la API
+// Modificar la URL base de la API para que apunte correctamente a tu backend
+
+// Asegurarse de que esta URL sea correcta y esté accesible
 const API_URL = 'https://app-task-backend.vercel.app/api';
 
-// Si quieres mantener el soporte para desarrollo local:
-// const API_URL = process.env.NODE_ENV === 'production' 
-//   ? 'https://app-task-backend.vercel.app/api' 
-//   : 'http://localhost:5000/api';
+// Alternativa con detección automática de entorno
+/*
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://app-task-backend.vercel.app/api' 
+  : 'http://localhost:5000/api';
+*/
 
 // Función para manejar errores de API de forma más robusta
 const handleApiResponse = async (response) => {
