@@ -1,6 +1,11 @@
 // API service for making requests to the backend
 
-const API_URL = 'https://app-task-backend.vercel.app/api'; // Update this if necessary
+// Modificar la constante API_URL
+
+// Cambia esto:
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://pp-task-chi.vercel.app/api'
+  : 'http://localhost:5000/api';
 
 // Helper function to handle fetch requests
 const fetchWithAuth = async (url, options = {}) => {

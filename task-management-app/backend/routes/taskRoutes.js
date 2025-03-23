@@ -359,6 +359,38 @@ router.post('/notifications/unsubscribe', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/tasks/notifications/unsubscribe
+// @desc    Unsubscribe from email notifications
+// @access  Private
+router.post('/notifications/unsubscribe', protect, async (req, res) => {
+  try {
+    const NotificationSubscription = (await import('../models/NotificationSubscription.js')).default;
+    
+    const result = await NotificationSubscription.updateOne(
+      { user: req.user.id, active: true },
+      { $set: { active: false } }
+    );
+    
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron suscripciones activas'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Suscripción cancelada correctamente'
+    });
+  } catch (error) {
+    console.error('Error unsubscribing from notifications:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al cancelar suscripción'
+    });
+  }
+});
+
 // @route   GET /api/tasks/notifications/preferences
 // @desc    Get user's notification preferences
 // @access  Private

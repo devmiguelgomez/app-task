@@ -186,7 +186,7 @@ const notificationService = {
   
   /**
    * Unsubscribe from email notifications
-   * @returns {Promise} - API response
+   * @returns {Promise<object>} - API response
    */
   unsubscribeFromEmailNotifications: async () => {
     try {

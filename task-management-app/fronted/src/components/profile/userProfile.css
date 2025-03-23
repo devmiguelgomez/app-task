@@ -5,6 +5,26 @@
   padding: 2rem;
 }
 
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.profile-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0; /* Sobrescribe el margen existente */
+  text-align: center;
+}
+
+.profile-theme-toggle {
+  display: flex;
+  align-items: center;
+}
+
 .profile-card {
   background-color: var(--bg-primary);
   border-radius: 12px;
@@ -12,15 +32,8 @@
   padding: 2rem;
 }
 
-.profile-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
 .profile-section {
+  margin-top: 1.5rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 1.5rem;

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaSave, FaBell, FaEnvelope, FaUser, FaCalendarAlt } from 'react-icons/fa';
+import { FaSave, FaBell, FaEnvelope, FaUser, FaCalendarAlt, FaMoon, FaSun } from 'react-icons/fa';
 import { authAPI, tasksAPI } from '../../services/api';
 import notificationService from '../../services/notificationService';
+import ThemeToggle from '../common/ThemeToggle';
 
 import './userProfile.css';
 
@@ -127,7 +128,12 @@ const UserProfile = () => {
         transition={{ duration: 0.3 }}
         className="profile-card"
       >
-        <h2 className="profile-title">Mi Perfil</h2>
+        <div className="profile-header">
+          <h2 className="profile-title">Mi Perfil</h2>
+          <div className="profile-theme-toggle">
+            <ThemeToggle />
+          </div>
+        </div>
         
         {error && <div className="profile-error">{error}</div>}
         {message && <div className="profile-message">{message}</div>}
