@@ -247,19 +247,7 @@ const UserProfile = () => {
           >
             <FaSave /> {saving ? 'Guardando...' : 'Guardar Preferencias'}
           </motion.button>
-          <button 
-            onClick={async () => {
-              try {
-                const response = await tasksAPI.sendTestEmail();
-                toast.success('Correo de prueba enviado. Revisa tu bandeja de entrada.');
-              } catch (error) {
-                toast.error('Error al enviar correo de prueba: ' + error.message);
-              }
-            }}
-            className="test-email-button"
-          >
-            Enviar correo de prueba
-          </button>
+          {/* El botón simple de correo de prueba ha sido eliminado */}
           <div className="test-email-container">
             <p>¿Quieres probar si las notificaciones por correo funcionan?</p>
             <motion.button
