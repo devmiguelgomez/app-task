@@ -205,4 +205,11 @@ export const tasksAPI = {
   filterByPriority: async (priority) => {
     return fetchWithAuth(`${API_URL}/tasks/priority/${priority}`);
   },
+
+  // Send test email
+  sendTestEmail: async () => {
+    return fetchWithAuth(`${API_URL}/tasks/send-test-email`, {
+      method: 'POST'
+    });
+  },
 };

@@ -260,6 +260,26 @@ const UserProfile = () => {
           >
             Enviar correo de prueba
           </button>
+          <div className="test-email-container">
+            <p>¿Quieres probar si las notificaciones por correo funcionan?</p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="test-email-button"
+              onClick={async () => {
+                try {
+                  toast.info('Enviando correo de prueba...');
+                  const response = await tasksAPI.sendTestEmail();
+                  toast.success('Correo de prueba enviado. Revisa tu bandeja de entrada.');
+                } catch (error) {
+                  console.error('Error al enviar correo de prueba:', error);
+                  toast.error('Error al enviar correo de prueba: ' + (error.message || 'Error desconocido'));
+                }
+              }}
+            >
+              <FaEnvelope /> Enviar correo de prueba
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </div>
