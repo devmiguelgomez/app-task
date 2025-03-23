@@ -42,19 +42,66 @@ router.post('/', [
   }
 
   try {
-    const { title, description, dueDate, priority } = req.body;
+    const { title, description, dueDate: taskDueDate, priority } = req.body;
 
     // Create new task
     const task = new Task({
       title,
       description,
-      dueDate,
+      dueDate: taskDueDate, // Corregido: usar taskDueDate en lugar de dueDate
       priority: priority || 'medium',
       user: req.user.id
     });
 
     // Save task to database
     const savedTask = await task.save();
+
+    // Sistema mejorado de notificaciones
+    try {
+      const taskDueDateObj = new Date(savedTask.dueDate);
+      const now = new Date();
+      const timeDiff = taskDueDateObj.getTime() - now.getTime();
+      const hoursDiff = timeDiff / (1000 * 60 * 60);
+      const daysDiff = hoursDiff / 24;
+      
+      // Buscar si el usuario tiene suscripción activa
+      const NotificationSubscription = (await import('../models/NotificationSubscription.js')).default;
+      const subscription = await NotificationSubscription.findOne({
+        user: req.user.id,
+        active: true,
+        'preferences.taskReminders': true
+      });
+      
+      if (subscription) {
+        const user = await User.findById(req.user.id);
+        const emailServiceModule = await import('../services/emailService.js');
+        const emailService = emailServiceModule.default;
+        
+        // Notificación para tareas que vencen en menos de 24 horas
+        if (hoursDiff <= 24 && hoursDiff > 0) {
+          await emailService.sendTaskReminder(
+            savedTask, 
+            user, 
+            '¡Atención! Tarea por vencer en menos de 24 horas',
+            `Tu tarea "${savedTask.title}" vence muy pronto (menos de 24 horas). Asegúrate de completarla a tiempo.`
+          );
+          console.log(`Correo de recordatorio URGENTE enviado para tarea próxima a vencer: ${savedTask.title}`);
+        } 
+        // Notificación para tareas que vencen en menos de 7 días pero más de 24 horas
+        else if (daysDiff <= 7 && hoursDiff > 24) {
+          await emailService.sendTaskReminder(
+            savedTask, 
+            user,
+            `Recordatorio: Tarea por vencer en ${Math.floor(daysDiff)} días`,
+            `Tu tarea "${savedTask.title}" vence en ${Math.floor(daysDiff)} días. Te recomendamos planificar su realización.`
+          );
+          console.log(`Correo de recordatorio semanal enviado para tarea: ${savedTask.title}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error al enviar recordatorio inmediato:', error);
+      // No interrumpimos la respuesta si falla el envío de correo
+    }
 
     res.status(201).json({
       success: true,

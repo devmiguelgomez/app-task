@@ -43,55 +43,61 @@ const emailService = {
    * Envía un recordatorio de tarea
    * @param {Object} task - Datos de la tarea
    * @param {Object} user - Datos del usuario
+   * @param {string} [customSubject=null] - Asunto personalizado
+   * @param {string} [customMessage=null] - Mensaje personalizado
    * @returns {Promise} - Resultado del envío
    */
-  sendTaskReminder: async (task, user) => {
-    const subject = `Recordatorio: "${task.title}" - Próxima a vencer`;
-    
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="color: #3b82f6;">Recordatorio de Tarea</h2>
-        </div>
-        
-        <p>Hola <strong>${user.name}</strong>,</p>
-        
-        <p>Te recordamos que tienes una tarea próxima a vencer:</p>
-        
-        <div style="background-color: #f9fafb; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #1f2937;">${task.title}</h3>
-          <p style="margin-bottom: 10px;">${task.description || 'Sin descripción'}</p>
-          <p><strong>Fecha límite:</strong> ${new Date(task.dueDate).toLocaleDateString('es-ES', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}</p>
-          <p><strong>Prioridad:</strong> ${
-            task.priority === 'high' ? '🔴 Alta' : 
-            task.priority === 'medium' ? '🟠 Media' : '🟢 Baja'
-          }</p>
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-          <a href="${process.env.FRONTEND_URL}/dashboard" 
-             style="background-color: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-            Ver mis tareas
-          </a>
-        </div>
-        
-        <p style="margin-top: 30px; font-size: 0.9em; color: #6b7280; text-align: center;">
-          Este es un correo automático, por favor no respondas a este mensaje.
-        </p>
-      </div>
-    `;
-    
-    return emailService.sendEmail({
-      to: user.email,
-      subject,
-      html
-    });
+  sendTaskReminder: async (task, user, customSubject = null, customMessage = null) => {
+    try {
+      const subject = customSubject || 'Recordatorio de tarea pendiente';
+      const messageIntro = customMessage || `Tu tarea "${task.title}" está próxima a vencer.`;
+
+      const info = await transporter.sendMail({
+        from: `"Recordatorio de Tareas" <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <h2 style="color: #333; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">Recordatorio de Tarea</h2>
+            <p style="font-size: 16px; color: #555;">${messageIntro}</p>
+            
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
+              <h3 style="color: #333; margin-top: 0;">Detalles de la tarea</h3>
+              <p><strong>Título:</strong> ${task.title}</p>
+              <p><strong>Descripción:</strong> ${task.description || 'Sin descripción'}</p>
+              <p><strong>Fecha de vencimiento:</strong> ${new Date(task.dueDate).toLocaleString()}</p>
+              <p><strong>Prioridad:</strong> ${
+                task.priority === 'high' ? '⚠️ Alta' : 
+                task.priority === 'medium' ? '⚡ Media' : '📝 Baja'
+              }</p>
+            </div>
+            
+            <p style="font-size: 14px; color: #777;">
+              Accede a tu cuenta para ver más detalles y marcar la tarea como completada.
+            </p>
+            
+            <div style="text-align: center; margin-top: 20px;">
+              <a href="${process.env.FRONTEND_URL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Ver mi tarea</a>
+            </div>
+            
+            <p style="font-size: 12px; color: #999; margin-top: 30px; border-top: 1px solid #f0f0f0; padding-top: 10px;">
+              Este es un correo automático, por favor no respondas a este mensaje.
+            </p>
+          </div>
+        `
+      });
+
+      return {
+        success: true,
+        messageId: info.messageId
+      };
+    } catch (error) {
+      console.error('Error sending task reminder email:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 };
 
