@@ -15,13 +15,17 @@ export const formatTaskDate = (dateString, timezoneOffset) => {
     
     // Si tenemos offset de zona horaria, lo aplicamos
     if (timezoneOffset !== undefined) {
-      // Obtener offset del servidor
-      const serverOffset = new Date().getTimezoneOffset();
-      // Calcular la diferencia entre el offset del servidor y el del usuario
-      const offsetDiff = serverOffset - timezoneOffset;
+      // Nota: El offset está en minutos y es positivo para zonas horarias detrás de UTC
+      // para América/Bogotá (UTC-5), el offset es 300 minutos
       
-      // Crear nueva fecha ajustada con el offset
-      const adjustedDate = new Date(date.getTime() + offsetDiff * 60000);
+      // NO aplicar ajuste basado en getTimezoneOffset del navegador
+      // Ya que la fecha en el backend ya está en UTC, y queremos mostrarla en la zona del usuario
+      
+      // Calcular el ajuste neto en milisegundos
+      const offsetAdjustmentMs = -timezoneOffset * 60 * 1000;
+      
+      // Aplicar el ajuste a la fecha
+      const adjustedDate = new Date(date.getTime() + offsetAdjustmentMs);
       
       // Formatear fecha según tamaño de pantalla
       const isMobile = window.innerWidth < 768;
@@ -34,10 +38,12 @@ export const formatTaskDate = (dateString, timezoneOffset) => {
         hour12: false
       };
       
+      // Usar la fecha ajustada pero SIN especificar timeZone en toLocaleString
+      // para que muestre la fecha exacta que calculamos
       return adjustedDate.toLocaleString('es-ES', options);
     }
     
-    // Si no hay offset disponible, usar hora local
+    // Si no hay offset disponible, usar hora local del navegador
     return date.toLocaleString('es-ES', {
       year: 'numeric',
       month: 'short',
