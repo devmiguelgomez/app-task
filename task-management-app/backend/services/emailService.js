@@ -51,9 +51,9 @@ const emailService = {
     try {
       const subject = customSubject || 'Recordatorio de tarea pendiente';
       const messageIntro = customMessage || `Tu tarea "${task.title}" está próxima a vencer.`;
-
-      const info = await transporter.sendMail({
-        from: `"Recordatorio de Tareas" <${process.env.EMAIL_USER}>`,
+      
+      // Implementa el envío real del correo
+      return emailService.sendEmail({
         to: user.email,
         subject: subject,
         html: `
@@ -72,31 +72,15 @@ const emailService = {
               }</p>
             </div>
             
-            <p style="font-size: 14px; color: #777;">
-              Accede a tu cuenta para ver más detalles y marcar la tarea como completada.
-            </p>
-            
             <div style="text-align: center; margin-top: 20px;">
               <a href="${process.env.FRONTEND_URL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Ver mi tarea</a>
             </div>
-            
-            <p style="font-size: 12px; color: #999; margin-top: 30px; border-top: 1px solid #f0f0f0; padding-top: 10px;">
-              Este es un correo automático, por favor no respondas a este mensaje.
-            </p>
           </div>
         `
       });
-
-      return {
-        success: true,
-        messageId: info.messageId
-      };
     } catch (error) {
-      console.error('Error sending task reminder email:', error);
-      return {
-        success: false,
-        error: error.message
-      };
+      console.error('Error al enviar recordatorio de tarea:', error);
+      return { success: false, error: error.message };
     }
   }
 };
