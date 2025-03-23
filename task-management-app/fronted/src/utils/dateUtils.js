@@ -6,9 +6,23 @@
  * @param {number} timezoneOffset - Offset de zona horaria en minutos
  * @returns {string} - Fecha formateada
  */
+// Ajustar el formato de fecha para pantallas pequeñas
 export const formatTaskDate = (dateString, timezoneOffset) => {
   try {
     const utcDate = new Date(dateString);
+    
+    // Detectar si es un dispositivo móvil con pantalla pequeña
+    const isMobileDevice = window.innerWidth < 640;
+    
+    // Opciones de formato diferentes para móvil y escritorio
+    const options = {
+      year: 'numeric',
+      month: isMobileDevice ? 'numeric' : 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
     
     // Si hay offset de zona horaria, aplicarlo
     if (timezoneOffset !== undefined) {
@@ -17,26 +31,11 @@ export const formatTaskDate = (dateString, timezoneOffset) => {
       const offsetDiff = serverOffset - userOffset;
       
       const adjustedDate = new Date(utcDate.getTime() + offsetDiff * 60000);
-      
-      return adjustedDate.toLocaleString('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
+      return adjustedDate.toLocaleString('es-ES', options);
     }
     
     // Sin offset, usar zona horaria local
-    return utcDate.toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
+    return utcDate.toLocaleString('es-ES', options);
   } catch (error) {
     console.error('Error formateando fecha:', error);
     return 'Fecha no disponible';

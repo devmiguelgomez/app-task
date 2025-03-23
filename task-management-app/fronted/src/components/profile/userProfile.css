@@ -77,6 +77,9 @@
   padding: 1rem;
   background-color: var(--bg-secondary);
   border-radius: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
 .notification-option h4 {
@@ -123,8 +126,8 @@
 
 .preference-item input[type="checkbox"] {
   accent-color: var(--primary-color);
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .preference-item h4 {
@@ -221,6 +224,43 @@
   background-color: #2563eb;
 }
 
+/* Ajustes móviles para el perfil */
+.profile-container {
+  padding: 1rem;
+}
+
+.profile-card {
+  padding: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .profile-container {
+    padding: 2rem;
+  }
+  
+  .profile-card {
+    padding: 2rem;
+  }
+}
+
+/* Preferencias y opciones de notificación más adaptables */
+.notification-option button {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .notification-option {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .notification-option button {
+    width: auto;
+  }
+}
+
+/* Mejorar área táctil para checkboxes */
 @media (max-width: 600px) {
   .profile-container {
     padding: 1rem;

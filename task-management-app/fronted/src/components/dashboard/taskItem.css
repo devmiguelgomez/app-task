@@ -53,12 +53,16 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .task-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 1rem;
+  word-break: break-word;
 }
 
 .task-title.completed {
@@ -69,12 +73,15 @@
 .task-actions {
   display: flex;
   gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-self: flex-end;
 }
 
 .task-action-button {
   padding: 0.5rem;
   border-radius: 9999px;
   transition: all 0.3s;
+  padding: 0.625rem;
 }
 
 .task-action-button:hover {
@@ -189,4 +196,21 @@
 .task-metadata-text.deadline {
   color: #ea580c;
   font-weight: 500;
+}
+
+/* Ajustes para TaskItem en móviles */
+@media (min-width: 640px) {
+  .task-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  .task-actions {
+    margin-top: 0;
+  }
+  
+  .task-title {
+    font-size: 1.25rem;
+  }
 }

@@ -11,6 +11,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+  -webkit-text-size-adjust: 100%; /* Prevenir zoom en formularios en iOS */
+  touch-action: manipulation; /* Mejorar rendimiento táctil */
 }
 
 h1 {
@@ -21,7 +24,7 @@ h1 {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.75em 1.25em; /* Área táctil más grande */
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -29,6 +32,7 @@ button {
   color: var(--text-primary);
   cursor: pointer;
   transition: border-color 0.25s;
+  min-height: 44px; /* Altura mínima recomendada */
 }
 
 button:hover {
@@ -48,4 +52,24 @@ button:focus-visible {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
+/* Ajuste de fuentes para mejor legibilidad */
+@media (max-width: 480px) {
+  body {
+    font-size: 16px; /* Tamaño base de fuente mínimo recomendado */
+  }
+  
+  h1 {
+    font-size: 1.75em;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+  }
+  
+  h3 {
+    font-size: 1.25em;
+  }
 }

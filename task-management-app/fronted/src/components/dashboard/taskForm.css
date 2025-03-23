@@ -36,12 +36,12 @@
 .form-select {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s;
-  font-size: 0.875rem;
+  font-size: 1rem;
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
@@ -65,11 +65,17 @@
   resize: vertical;
 }
 
+/* Formulario responsivo */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (min-width: 768px) {
@@ -87,7 +93,7 @@
   width: 100%;
 }
 
-.btn {
+.form-actions .btn {
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -96,7 +102,15 @@
   cursor: pointer;
   border: none;
   text-align: center;
-  min-width: 6rem;
+  flex: 1;
+  min-width: auto;
+}
+
+@media (min-width: 640px) {
+  .form-actions .btn {
+    flex: 0 1 auto;
+    min-width: 6rem;
+  }
 }
 
 .btn:hover {

@@ -32,6 +32,14 @@
   margin-bottom: 2rem;
 }
 
+@media (min-width: 768px) {
+  .dashboard-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
 .dashboard-title {
   font-size: 1.875rem;
   font-weight: 700;
@@ -52,6 +60,20 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+@media (min-width: 768px) {
+  .dashboard-actions {
+    margin-top: 0;
+    width: auto;
+  }
+}
+
+.dashboard-actions {
+  margin-top: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 /* New Task Button */
@@ -208,9 +230,23 @@
 /* Tasks Grid */
 .tasks-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr); /* Una columna en móviles */
+  gap: 1rem;
   perspective: 1000px;
+}
+
+@media (min-width: 640px) {
+  .tasks-grid {
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas en tabletas */
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tasks-grid {
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas en escritorio */
+    gap: 1.5rem;
+  }
 }
 
 /* Empty state */
@@ -271,4 +307,29 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1rem;
+}
+
+.modal-content {
+  width: 95%;
+  max-width: 28rem;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .modal-content {
+    padding: 1.5rem;
+  }
+}
+
+/* Ajustar botones en móviles */
+.new-task-button, .profile-button, .logout-button, .notification-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .new-task-button, .profile-button, .logout-button, .notification-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
 }
