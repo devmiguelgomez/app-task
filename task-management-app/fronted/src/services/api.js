@@ -138,10 +138,10 @@ export const tasksAPI = {
   },
   
   // Subscribe to task notifications
-  subscribeToNotifications: async (preferences) => {
+  subscribeToNotifications: async (data) => {
     return fetchWithAuth(`${API_URL}/tasks/notifications/subscribe`, {
       method: 'POST',
-      body: JSON.stringify(preferences),
+      body: JSON.stringify(data),
     });
   },
   

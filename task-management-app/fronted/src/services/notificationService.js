@@ -50,6 +50,30 @@ const notificationService = {
   },
   
   /**
+   * Check current status of notification permissions
+   * @returns {Object} Status object with granted boolean
+   */
+  checkNotificationStatus: () => {
+    if (!('Notification' in window)) {
+      return { 
+        granted: false, 
+        status: 'unsupported',
+        message: 'Este navegador no soporta notificaciones de escritorio' 
+      };
+    }
+    
+    return { 
+      granted: Notification.permission === 'granted', 
+      status: Notification.permission,
+      message: Notification.permission === 'granted' 
+        ? 'Notificaciones ya habilitadas' 
+        : Notification.permission === 'denied'
+          ? 'Las notificaciones han sido bloqueadas por el usuario'
+          : 'Notificaciones pendientes de permiso'
+    };
+  },
+
+  /**
    * Send a browser notification
    * @param {Object} task - The task object
    * @param {string} type - The type of notification (reminder, due, created, etc.)
@@ -144,15 +168,16 @@ const notificationService = {
         throw new Error('No se encontró información del usuario');
       }
       
-      // Add email to preferences
-      const notificationPrefs = {
-        ...preferences,
-        email: user.email
-      };
-      
-      // Use the API service to subscribe
+      // Call the API service to subscribe
       const { tasksAPI } = await import('./api');
-      return tasksAPI.subscribeToNotifications(notificationPrefs);
+      return tasksAPI.subscribeToNotifications({
+        email: user.email,
+        preferences: {
+          taskReminders: preferences.taskReminders || true,
+          dueDateAlerts: preferences.dueDateAlerts || true,
+          weeklyDigest: preferences.weeklyDigest || false
+        }
+      });
     } catch (error) {
       console.error('Error al suscribirse a notificaciones por email:', error);
       throw error;

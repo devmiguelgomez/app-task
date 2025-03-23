@@ -43,8 +43,8 @@ const UserProfile = () => {
           console.log('No hay suscripciones activas');
         }
         
-        // Verificar estado de notificaciones del navegador
-        const browserNotificationStatus = await notificationService.checkNotificationStatus();
+        // Verificar estado de notificaciones del navegador - LÍNEA CORREGIDA
+        const browserNotificationStatus = notificationService.checkNotificationStatus();
         setNotificationStatus(prev => ({ ...prev, browser: browserNotificationStatus.granted }));
         
       } catch (error) {

@@ -275,7 +275,7 @@ const Dashboard = () => {
       await notificationService.subscribeToEmailNotifications({
         taskReminders: true,
         dueDateAlerts: true,
-        completionNotifications: true
+        weeklyDigest: false // Cambiado de completionNotifications a weeklyDigest para coincidir con el modelo
       });
       toast.success('Te has suscrito a las notificaciones por email correctamente.');
     } catch (error) {
