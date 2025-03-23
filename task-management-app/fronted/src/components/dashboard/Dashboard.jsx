@@ -42,15 +42,22 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  // Request notification permissions
-  useEffect(() => {
-    const requestPermissions = async () => {
+  // Definir la función a nivel de componente, no solo dentro del useEffect
+  const requestPermissions = async () => {
+    try {
       const result = await notificationService.requestNotificationPermission();
       setNotificationsEnabled(result.granted);
       setNotificationStatus(result.status);
       setNotificationMessage(result.message);
-    };
-    
+      return result;
+    } catch (error) {
+      console.error('Error al solicitar permisos:', error);
+      setError('Error al solicitar permisos de notificación');
+    }
+  };
+
+  // useEffect que llama a la función al cargar el componente
+  useEffect(() => {
     requestPermissions();
   }, []);
 
@@ -270,10 +277,10 @@ const Dashboard = () => {
         dueDateAlerts: true,
         completionNotifications: true
       });
-      alert('Te has suscrito a las notificaciones por email correctamente.');
+      toast.success('Te has suscrito a las notificaciones por email correctamente.');
     } catch (error) {
       console.error('Error subscribing to notifications:', error);
-      alert('Error al suscribirse a las notificaciones por email.');
+      toast.error('Error al suscribirse a las notificaciones por email.');
     }
   };
 
@@ -338,7 +345,7 @@ const Dashboard = () => {
             >
               <FaPlus className="mr-2" /> Nueva Tarea
             </motion.button>
-            {/* Botón para activar notificaciones (añadir a la interfaz) */}
+            {/* Botón para activar notificaciones */}
             <button 
               onClick={requestPermissions} 
               className="notification-btn"
