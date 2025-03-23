@@ -423,4 +423,55 @@ router.get('/notifications/preferences', protect, async (req, res) => {
   }
 });
 
+// Agregar una ruta de prueba para enviar un correo
+
+// @route   POST /api/tasks/send-test-email
+// @desc    Send a test email to the user
+// @access  Private
+router.post('/send-test-email', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+    
+    // Crear una tarea de prueba
+    const testTask = {
+      _id: 'test123',
+      title: 'Tarea de prueba',
+      description: 'Esta es una tarea de prueba para verificar el envío de correos',
+      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Mañana
+      priority: 'high',
+      status: 'pending'
+    };
+    
+    const emailService = require('../services/emailService');
+    const result = await emailService.sendTaskReminder(testTask, user);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: `Correo de prueba enviado a ${user.email}`,
+        details: result
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Error al enviar correo de prueba',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    console.error('Error sending test email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error del servidor al enviar correo de prueba',
+      error: error.message
+    });
+  }
+});
+
 export default router;

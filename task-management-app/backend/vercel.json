@@ -15,10 +15,5 @@
       "src": "/(.*)",
       "dest": "/server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "MONGODB_URI": "mongodb+srv://devmiguelgomez:IJmPuH8ANRjx1BEe@paginas.ukl2k.mongodb.net/Tareasapp?retryWrites=true&w=majority&appName=Paginas",
-    "JWT_SECRET": "task_management_secret_key"
-  }
+  ]
 }

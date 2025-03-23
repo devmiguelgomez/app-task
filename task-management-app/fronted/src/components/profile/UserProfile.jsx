@@ -4,6 +4,7 @@ import { FaSave, FaBell, FaEnvelope, FaUser, FaCalendarAlt, FaMoon, FaSun } from
 import { authAPI, tasksAPI } from '../../services/api';
 import notificationService from '../../services/notificationService';
 import ThemeToggle from '../common/ThemeToggle';
+import { toast } from 'react-toastify';
 
 import './userProfile.css';
 
@@ -246,6 +247,19 @@ const UserProfile = () => {
           >
             <FaSave /> {saving ? 'Guardando...' : 'Guardar Preferencias'}
           </motion.button>
+          <button 
+            onClick={async () => {
+              try {
+                const response = await tasksAPI.sendTestEmail();
+                toast.success('Correo de prueba enviado. Revisa tu bandeja de entrada.');
+              } catch (error) {
+                toast.error('Error al enviar correo de prueba: ' + error.message);
+              }
+            }}
+            className="test-email-button"
+          >
+            Enviar correo de prueba
+          </button>
         </div>
       </motion.div>
     </div>

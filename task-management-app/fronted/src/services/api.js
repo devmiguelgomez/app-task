@@ -1,6 +1,12 @@
 // API service for making requests to the backend
 
-const API_URL = 'https://app-task-backend.vercel.app/api'; // Update this if necessary
+// Usa la URL completa del backend
+const API_URL = 'https://app-task-backend.vercel.app/api';
+
+// También añade un fallback local para desarrollo
+// const API_URL = process.env.NODE_ENV === 'production' 
+//   ? 'https://app-task-backend.vercel.app/api' 
+//   : 'http://localhost:5000/api';
 
 // Función para manejar errores de API de forma más robusta
 const handleApiResponse = async (response) => {
@@ -75,23 +81,42 @@ export const authAPI = {
     }
   },
 
-  // Login user
+  // Login user - Modificar esta función
   login: async (credentials) => {
-    return fetchWithAuth(`${API_URL}/users/login`, {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
+    try {
+      const response = await fetch(`${API_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+      
+      return await handleApiResponse(response);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   },
-  
-  // Social login methods have been removed
 
+  // Social login methods have been removed
 
   // Forgot password
   forgotPassword: async (email) => {
-    return fetchWithAuth(`${API_URL}/users/forgot-password`, {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await fetch(`${API_URL}/users/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      
+      return await handleApiResponse(response);
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      throw error;
+    }
   },
 
   // Reset password
