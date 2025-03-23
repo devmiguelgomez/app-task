@@ -29,3 +29,26 @@
 .theme-icon.moon {
   color: #6366f1;
 }
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Ajuste para dentro del perfil */
+.profile-theme-toggle .theme-toggle-btn {
+  font-size: 1.4rem;
+}

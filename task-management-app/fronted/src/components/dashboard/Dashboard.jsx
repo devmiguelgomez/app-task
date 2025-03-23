@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaPlus, FaCalendarAlt, FaExclamationCircle, FaCheck, FaClock, FaTrash, FaEdit, FaSignOutAlt, FaBell, FaUser } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '../../utils/toastUtils';
 
 // Task components
@@ -22,6 +22,8 @@ import ThemeToggle from '../common/ThemeToggle';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Ahora puedes usar location
+  
   // State for tasks and modal
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

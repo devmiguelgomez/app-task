@@ -1,9 +1,7 @@
-// API service for making requests to the backend
-
-// Usa la URL completa del backend
+// Modifica la URL base de la API
 const API_URL = 'https://app-task-backend.vercel.app/api';
 
-// También añade un fallback local para desarrollo
+// Si quieres mantener el soporte para desarrollo local:
 // const API_URL = process.env.NODE_ENV === 'production' 
 //   ? 'https://app-task-backend.vercel.app/api' 
 //   : 'http://localhost:5000/api';

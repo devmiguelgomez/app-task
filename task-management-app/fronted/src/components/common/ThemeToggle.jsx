@@ -1,34 +1,35 @@
-import { useState, useEffect } from 'react';
-import { FaSun, FaMoon } from 'react-icons/fa';
-import './themeToggle.css';
+import React, { useEffect, useState } from 'react';
+import { FaMoon, FaSun } from 'react-icons/fa';
+import './ThemeToggle.css';
 
 const ThemeToggle = () => {
   const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem('theme') === 'dark' || 
-    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    localStorage.getItem('theme') === 'dark'
   );
 
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    }
+    // Aplicar tema inicial
+    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    // Guardar preferencia en localStorage
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    
+    // Aplicar tema al body
+    document.body.setAttribute('data-theme', newMode ? 'dark' : 'light');
   };
 
   return (
     <button 
-      className="theme-toggle-button" 
+      className="theme-toggle-btn" 
       onClick={toggleTheme}
-      aria-label={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
     >
-      {isDarkMode ? <FaSun className="theme-icon sun" /> : <FaMoon className="theme-icon moon" />}
+      {isDarkMode ? <FaSun /> : <FaMoon />}
     </button>
   );
 };
