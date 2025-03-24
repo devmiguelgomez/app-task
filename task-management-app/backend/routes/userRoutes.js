@@ -161,12 +161,19 @@ router.post('/forgot-password', [
     user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
     await user.save();
 
+    // Asegurarse de que FRONTEND_URL no termine con una barra (/)
+    const baseUrl = process.env.FRONTEND_URL.endsWith('/') 
+      ? process.env.FRONTEND_URL.slice(0, -1) 
+      : process.env.FRONTEND_URL;
+
+    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+
+    console.log('URL de restablecimiento generada:', resetUrl); // Para depuración
+
     // Implementar el envío de correo
     try {
       const emailServiceModule = await import('../services/emailService.js');
       const emailService = emailServiceModule.default;
-      
-      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
       
       const result = await emailService.sendEmail({
         to: user.email,
