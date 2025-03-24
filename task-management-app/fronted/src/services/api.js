@@ -126,7 +126,8 @@ export const authAPI = {
     try {
       console.log('Enviando solicitud de reset con token:', data.token);
       
-      const response = await fetch(`${API_URL}/users/reset-password`, {
+      // Cambiar esta URL para que coincida con la ruta en userRoutes.js
+      const response = await fetch(`${API_URL}/api/users/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -134,14 +135,12 @@ export const authAPI = {
         body: JSON.stringify(data)
       });
 
-      const responseData = await response.json();
-      
       if (!response.ok) {
-        console.error('Error en resetPassword:', responseData);
-        throw new Error(responseData.error || 'Error al restablecer la contraseña');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al restablecer la contraseña');
       }
 
-      return responseData;
+      return await response.json();
     } catch (error) {
       console.error('Error en resetPassword:', error);
       throw error;

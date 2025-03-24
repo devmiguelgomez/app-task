@@ -42,6 +42,14 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan('dev'));
 
+// Añade esta línea después de la creación de la app:
+
+// Middleware para mostrar las rutas en las peticiones
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 // MongoDB connection options
 const mongoOptions = {
   useNewUrlParser: true,
