@@ -2,28 +2,37 @@
 
 const API_URL = 'https://app-task-backend.vercel.app/api'; // Agrega /api
 
-// Función para manejar respuestas de API de manera consistente
+// Actualiza la función de manejo de respuestas API
 const handleApiResponse = async (response) => {
   const contentType = response.headers.get("content-type");
   
-  // Si el servidor devuelve un error 404
+  // Para depuración: registra todos los errores de red
+  console.log(`API Response: ${response.status} ${response.statusText} for ${response.url}`);
+  
+  if (response.status === 504) {
+    console.error("Error de timeout. El servidor tardó demasiado en responder.");
+    throw new Error("El servidor no está respondiendo. Por favor, intenta más tarde.");
+  }
+  
   if (response.status === 404) {
-    throw new Error("El recurso solicitado no se encuentra disponible. Es posible que el servidor esté en mantenimiento.");
+    console.error("Recurso no encontrado:", response.url);
+    throw new Error("El recurso solicitado no está disponible.");
   }
   
-  // Si el servidor devuelve un error 504 o similar
   if (response.status >= 500) {
-    throw new Error("Error del servidor: " + response.status);
+    console.error("Error del servidor:", response.status, response.url);
+    throw new Error(`Error del servidor: ${response.status}. Por favor, contacta al administrador.`);
   }
   
-  // Si la respuesta no es JSON, es un error
   if (!contentType || !contentType.includes("application/json")) {
-    throw new Error(`Formato de respuesta inesperado: ${response.status} ${response.statusText}`);
+    console.error("Respuesta no-JSON recibida:", response.status, contentType);
+    throw new Error(`Formato de respuesta inesperado: ${response.status}`);
   }
   
   const data = await response.json();
   
   if (!response.ok) {
+    console.error("Error en respuesta API:", data);
     throw new Error(data.error || data.message || "Error en la solicitud");
   }
   

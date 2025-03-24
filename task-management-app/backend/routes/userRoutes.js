@@ -161,15 +161,50 @@ router.post('/forgot-password', [
     user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // In a real application, you would send an email with the reset link
-    // For now, we'll just return the token
+    // Implementar el envío de correo
+    try {
+      const emailServiceModule = await import('../services/emailService.js');
+      const emailService = emailServiceModule.default;
+      
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+      
+      const result = await emailService.sendEmail({
+        to: user.email,
+        subject: 'Restablecimiento de contraseña',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #333;">Recuperación de contraseña</h2>
+            <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${resetUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Restablecer contraseña</a>
+            </div>
+            <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+            <p>El enlace expirará en 1 hora.</p>
+          </div>
+        `
+      });
+      
+      console.log('Resultado del envío de correo de restablecimiento:', result);
+      
+      if (!result.success) {
+        console.error('Error al enviar correo de restablecimiento:', result.error);
+        return res.status(500).json({
+          success: false,
+          error: 'Error al enviar el correo electrónico de restablecimiento'
+        });
+      }
+      
+    } catch (emailError) {
+      console.error('Error al importar o usar el servicio de email:', emailError);
+      // No detener el proceso si falla el correo
+    }
+
     res.json({
       success: true,
-      message: 'Instrucciones de restablecimiento de contraseña enviadas',
-      resetToken // In production, don't send this directly to the client
+      message: 'Instrucciones de restablecimiento de contraseña enviadas'
     });
   } catch (error) {
-    console.error(error.message);
+    console.error('Error en forgot-password:', error);
     res.status(500).json({
       success: false,
       error: 'Error en el servidor'
