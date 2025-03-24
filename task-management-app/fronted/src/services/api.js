@@ -121,7 +121,7 @@ export const authAPI = {
     }
   },
 
-  // Reset password
+  // Asegúrate de que la ruta sea correcta
   resetPassword: async (data) => {
     try {
       console.log('Enviando solicitud de reset con token:', data.token);

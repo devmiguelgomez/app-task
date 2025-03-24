@@ -166,7 +166,7 @@ router.post('/forgot-password', [
       ? process.env.FRONTEND_URL.slice(0, -1) 
       : process.env.FRONTEND_URL;
 
-    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
     console.log('URL de restablecimiento generada:', resetUrl); // Para depuración
 
@@ -225,36 +225,59 @@ router.post('/forgot-password', [
 // @route   PUT /api/users/reset-password
 // @desc    Reset password
 // @access  Public
-router.put('/reset-password', [
-  body('token', 'Token es requerido').not().isEmpty(),
-  body('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 })
-], async (req, res) => {
-  // Check for validation errors
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+router.put('/reset-password', async (req, res) => {
   const { token, password } = req.body;
 
-  try {
-    // Find user by reset token
-    const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpire: { $gt: Date.now() }
+  if (!token || !password) {
+    return res.status(400).json({
+      success: false,
+      error: 'Por favor proporcione un token y una nueva contraseña'
     });
+  }
 
-    if (!user) {
+  try {
+    // Verificar el token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
       return res.status(400).json({
         success: false,
         error: 'Token inválido o expirado'
       });
     }
 
-    // Update password
-    user.password = password;
+    // Buscar el usuario
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar si el token coincide con el almacenado en la base de datos (opcional)
+    if (user.resetPasswordToken !== token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token no válido para este usuario'
+      });
+    }
+
+    // Verificar si el token ha expirado
+    if (user.resetPasswordExpire && user.resetPasswordExpire < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Token expirado. Por favor solicita un nuevo restablecimiento de contraseña'
+      });
+    }
+
+    // Actualizar la contraseña
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+    
     await user.save();
 
     res.json({
@@ -262,7 +285,7 @@ router.put('/reset-password', [
       message: 'Contraseña actualizada correctamente'
     });
   } catch (error) {
-    console.error(error.message);
+    console.error('Error en reset-password:', error);
     res.status(500).json({
       success: false,
       error: 'Error en el servidor'

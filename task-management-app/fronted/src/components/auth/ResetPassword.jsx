@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { FaLock, FaShieldAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
@@ -10,8 +10,9 @@ import { authAPI } from '../../services/api';
 import './resetPassword.css';
 
 const ResetPassword = () => {
-  const { token } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   
   const [formData, setFormData] = useState({
     password: '',
