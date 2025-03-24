@@ -1,34 +1,33 @@
-// Modificar la URL base de la API para que apunte correctamente a tu backend
+// Corrige la URL base y añade funciones de utilidad para manejar errores
 
-// Asegúrate de que API_URL esté correctamente definido
-const API_URL = 'https://app-task-backend.vercel.app'; // Verifica esta URL
+const API_URL = 'https://app-task-backend.vercel.app/api'; // Agrega /api
 
-// Alternativa con detección automática de entorno
-/*
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://app-task-backend.vercel.app/api' 
-  : 'http://localhost:5000/api';
-*/
-
-// Función para manejar errores de API de forma más robusta
+// Función para manejar respuestas de API de manera consistente
 const handleApiResponse = async (response) => {
-  if (!response.ok) {
-    // Para errores 404, mostrar un mensaje más amigable
-    if (response.status === 404) {
-      throw new Error("El recurso solicitado no se encuentra disponible. Es posible que el servidor esté en mantenimiento.");
-    }
-    
-    // Intentar parsear el error como JSON
-    try {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Error del servidor: ${response.statusText}`);
-    } catch (e) {
-      // Si no puede parsear JSON, usar el texto del status
-      throw new Error(`Error del servidor: ${response.statusText}`);
-    }
+  const contentType = response.headers.get("content-type");
+  
+  // Si el servidor devuelve un error 404
+  if (response.status === 404) {
+    throw new Error("El recurso solicitado no se encuentra disponible. Es posible que el servidor esté en mantenimiento.");
   }
   
-  return response.json();
+  // Si el servidor devuelve un error 504 o similar
+  if (response.status >= 500) {
+    throw new Error("Error del servidor: " + response.status);
+  }
+  
+  // Si la respuesta no es JSON, es un error
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Formato de respuesta inesperado: ${response.status} ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "Error en la solicitud");
+  }
+  
+  return data;
 };
 
 // Helper function to handle fetch requests
@@ -59,7 +58,7 @@ const fetchWithAuth = async (url, options = {}) => {
 
 // Auth API calls
 export const authAPI = {
-  // Register a new user
+  // Registro de usuario
   register: async (userData) => {
     try {
       const response = await fetch(`${API_URL}/users/register`, {
@@ -70,20 +69,14 @@ export const authAPI = {
         body: JSON.stringify(userData),
       });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || data.errors?.[0]?.msg || 'Error en el registro');
-      }
-      
-      return data;
+      return await handleApiResponse(response);
     } catch (error) {
       console.error('Registration error details:', error);
       throw error;
     }
   },
 
-  // Login user - Modificar esta función
+  // Login user
   login: async (credentials) => {
     try {
       const response = await fetch(`${API_URL}/users/login`, {
@@ -101,13 +94,10 @@ export const authAPI = {
     }
   },
 
-  // Social login methods have been removed
-
   // Forgot password
   forgotPassword: async (email) => {
     try {
-      // Asegúrate de que la ruta sea exactamente igual a la configurada en el backend
-      const response = await fetch(`${API_URL}/api/users/forgot-password`, {
+      const response = await fetch(`${API_URL}/users/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,23 +105,10 @@ export const authAPI = {
         body: JSON.stringify({ email }),
       });
       
-      // Verifica si la respuesta es HTML (error) antes de intentar parsear JSON
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw { message: data.error || 'Error en el servidor' };
-        }
-        
-        return data;
-      } else {
-        // Si recibimos HTML u otro formato, es un error
-        throw { message: `Error del servidor: ${response.status} ${response.statusText}` };
-      }
+      return await handleApiResponse(response);
     } catch (error) {
       console.error('Error in forgotPassword API call:', error);
-      throw { message: error.message || 'Error de conexión con el servidor' };
+      throw error;
     }
   },
 
