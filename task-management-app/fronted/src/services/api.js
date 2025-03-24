@@ -129,6 +129,29 @@ export const authAPI = {
     });
   },
 
+  // Añadir al objeto authAPI:
+  resetPassword: async (data) => {
+    try {
+      const response = await fetch(`${API_URL}/api/users/reset-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al restablecer la contraseña');
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error en resetPassword:', error);
+      throw error;
+    }
+  },
+
   // Get user profile
   getProfile: async () => {
     return fetchWithAuth(`${API_URL}/users/profile`);

@@ -10,6 +10,7 @@ import Register from './components/auth/Register'
 import ForgotPassword from './components/auth/ForgotPassword'
 import Dashboard from './components/dashboard/Dashboard'
 import UserProfile from './components/profile/UserProfile'
+import ResetPassword from './components/auth/ResetPassword'
 
 // Modificar el componente ProtectedRoute para que funcione correctamente
 const ProtectedRoute = ({ children }) => {
@@ -65,6 +66,7 @@ function App() {
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
