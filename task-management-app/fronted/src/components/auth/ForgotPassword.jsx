@@ -25,12 +25,21 @@ const ForgotPassword = () => {
     setLoading(true);
     
     try {
-      await authAPI.forgotPassword(email);
-      console.log('Password reset requested for:', email);
-      setIsSubmitted(true);
+      const response = await authAPI.forgotPassword(email);
+      
+      if (response.success) {
+        console.log('Password reset requested for:', email);
+        setIsSubmitted(true);
+      } else {
+        setError(response.error || 'Error al solicitar el restablecimiento. Intenta de nuevo.');
+      }
     } catch (error) {
-      console.error('Password reset error:', error.message);
-      setError(error.message || 'Error al solicitar el restablecimiento de contraseña. Por favor, intenta de nuevo.');
+      console.error('Password reset error:', error);
+      setError(
+        error.response?.data?.error || 
+        error.message || 
+        'No pudimos procesar tu solicitud. Por favor, intenta más tarde.'
+      );
     } finally {
       setLoading(false);
     }
@@ -71,16 +80,18 @@ const ForgotPassword = () => {
                 className="form-input"
                 required
               />
-              {error && <p className="form-error">{error}</p>}
             </div>
-
+            
+            {error && <p className="form-error">{error}</p>}
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
               className="btn btn-primary"
+              disabled={loading}
             >
-              Enviar Instrucciones
+              {loading ? 'Enviando...' : 'Enviar Instrucciones'}
             </motion.button>
           </form>
         ) : (

@@ -106,7 +106,7 @@ export const authAPI = {
   // Forgot password
   forgotPassword: async (email) => {
     try {
-      const response = await fetch(`${API_URL}/users/forgot-password`, {
+      const response = await fetch(`${API_URL}/api/users/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,9 +114,15 @@ export const authAPI = {
         body: JSON.stringify({ email }),
       });
       
-      return await handleApiResponse(response);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw { response: { data } };
+      }
+      
+      return data;
     } catch (error) {
-      console.error('Forgot password error:', error);
+      console.error('Error in forgotPassword API call:', error);
       throw error;
     }
   },
