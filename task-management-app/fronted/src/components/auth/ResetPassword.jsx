@@ -14,6 +14,12 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   
+  useEffect(() => {
+    console.log('ResetPassword component loaded');
+    console.log('Current URL:', window.location.href);
+    console.log('Token from URL:', token);
+  }, [token]);
+
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
