@@ -104,7 +104,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
+// Asegúrate de que las rutas estén correctamente configuradas
 app.use('/api/users', userRoutes);
+// O si lo tienes así:
+// app.use('/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Root route

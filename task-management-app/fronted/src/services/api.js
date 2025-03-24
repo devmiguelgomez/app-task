@@ -126,8 +126,8 @@ export const authAPI = {
     try {
       console.log('Enviando solicitud de reset con token:', data.token);
       
-      // Cambiar esta URL para que coincida con la ruta en userRoutes.js
-      const response = await fetch(`${API_URL}/api/users/reset-password`, {
+      // URL CORREGIDA - Eliminar el /api/ duplicado
+      const response = await fetch(`${API_URL}/users/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -135,9 +135,16 @@ export const authAPI = {
         body: JSON.stringify(data)
       });
 
+      // Verificar respuesta antes de procesar JSON
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al restablecer la contraseña');
+        let errorMessage = 'Error al restablecer la contraseña';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.error('No se pudo parsear la respuesta de error', e);
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();
