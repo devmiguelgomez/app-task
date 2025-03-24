@@ -183,10 +183,13 @@ router.post('/forgot-password', [
             <h2 style="color: #333;">Recuperación de contraseña</h2>
             <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:</p>
             <div style="text-align: center; margin: 20px 0;">
-              <a href="${resetUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Restablecer contraseña</a>
+              <a href="${resetUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Restablecer contraseña</a>
             </div>
             <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
             <p>El enlace expirará en 1 hora.</p>
+            <p>Si el botón no funciona, copia y pega esta URL en tu navegador: <br> 
+              <a href="${resetUrl}">${resetUrl}</a>
+            </p>
           </div>
         `
       });

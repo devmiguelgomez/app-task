@@ -25,6 +25,8 @@ const ResetPassword = () => {
   const { password, confirmPassword } = formData;
 
   useEffect(() => {
+    console.log('Token recibido en URL:', token);
+    
     // Verificar si el token es válido (opcional)
     const verifyToken = async () => {
       try {
