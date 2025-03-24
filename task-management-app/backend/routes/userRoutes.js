@@ -91,6 +91,7 @@ router.post('/login', [
     const user = await User.findOne({ email });
 
     if (!user) {
+      console.log(`Intento de login fallido: Usuario no encontrado para email ${email}`);
       return res.status(401).json({
         success: false,
         error: 'Credenciales inválidas'
@@ -98,15 +99,19 @@ router.post('/login', [
     }
 
     // Check if password matches
+    console.log(`Verificando contraseña para usuario: ${email}`);
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
+      console.log(`Intento de login fallido: Contraseña incorrecta para ${email}`);
       return res.status(401).json({
         success: false,
         error: 'Credenciales inválidas'
       });
     }
 
+    console.log(`Login exitoso para usuario: ${email}`);
+    
     // Return JWT token
     res.json({
       success: true,
@@ -118,7 +123,7 @@ router.post('/login', [
       }
     });
   } catch (error) {
-    console.error(error.message);
+    console.error('Error en login:', error);
     res.status(500).json({
       success: false,
       error: 'Error en el servidor'
@@ -241,6 +246,7 @@ router.put('/reset-password', async (req, res) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
+      console.error('Error al verificar token:', error);
       return res.status(400).json({
         success: false,
         error: 'Token inválido o expirado'
@@ -258,6 +264,10 @@ router.put('/reset-password', async (req, res) => {
 
     // Verificar si el token coincide con el almacenado en la base de datos (opcional)
     if (user.resetPasswordToken !== token) {
+      console.log('Token no coincide:', { 
+        storedToken: user.resetPasswordToken,
+        receivedToken: token.substring(0, 20) + '...' 
+      });
       return res.status(400).json({
         success: false,
         error: 'Token no válido para este usuario'
@@ -272,13 +282,27 @@ router.put('/reset-password', async (req, res) => {
       });
     }
 
-    // Actualizar la contraseña
+    // SOLUCIÓN: Hashear la contraseña manualmente en lugar de depender del middleware
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Actualizar la contraseña
+    user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     
-    await user.save();
+    // Deshabilitar el middleware pre-save para este caso
+    const savedUser = await User.findByIdAndUpdate(
+      user._id,
+      { 
+        password: hashedPassword,
+        resetPasswordToken: undefined,
+        resetPasswordExpire: undefined
+      },
+      { new: true }
+    );
+
+    console.log('Contraseña actualizada para usuario:', user.email);
 
     res.json({
       success: true,

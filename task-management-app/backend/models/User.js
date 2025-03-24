@@ -28,15 +28,13 @@ const userSchema = new mongoose.Schema({
 
 // Encrypt password before saving
 userSchema.pre('save', async function(next) {
-  // Only hash the password if it's modified (or new)
+  // Solo hashear la contraseña si ha sido modificada
   if (!this.isModified('password')) {
     return next();
   }
-  
+
   try {
-    // Generate salt
     const salt = await bcrypt.genSalt(10);
-    // Hash password with salt
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
@@ -44,9 +42,13 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Method to compare password for login
+// Método para verificar contraseña
 userSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  try {
+    return await bcrypt.compare(enteredPassword, this.password);
+  } catch (error) {
+    throw error;
+  }
 };
 
 const User = mongoose.model('User', userSchema);
