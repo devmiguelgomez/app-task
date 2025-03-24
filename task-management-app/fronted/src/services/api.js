@@ -126,7 +126,7 @@ export const authAPI = {
     try {
       console.log('Enviando solicitud de reset con token:', data.token);
       
-      const response = await fetch(`${API_URL}/api/users/reset-password`, {
+      const response = await fetch(`${API_URL}/users/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

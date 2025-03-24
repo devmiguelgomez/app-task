@@ -27,20 +27,7 @@ const ResetPassword = () => {
   useEffect(() => {
     console.log('Token recibido en URL:', token);
     
-    // Verificar si el token es válido (opcional)
-    const verifyToken = async () => {
-      try {
-        // Si tienes un endpoint para verificar tokens, úsalo aquí
-        // await authAPI.verifyResetToken(token);
-      } catch (error) {
-        setTokenValid(false);
-        setError('El enlace de restablecimiento no es válido o ha expirado.');
-      }
-    };
-    
-    if (token) {
-      verifyToken();
-    } else {
+    if (!token) {
       setTokenValid(false);
       setError('No se proporcionó un token de restablecimiento válido.');
     }
