@@ -3,14 +3,31 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configurar transporter de nodemailer
+// Verifica la configuración del correo electrónico
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Puedes cambiarlo según tu proveedor
+  service: 'gmail', // O el servicio que uses
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    pass: process.env.EMAIL_PASSWORD, // Usa una contraseña de aplicación para Gmail
+  },
+  tls: {
+    rejectUnauthorized: false // Añade esto para entornos de desarrollo
   }
 });
+
+// Añade una función de prueba para verificar la configuración
+const testEmailConnection = async () => {
+  try {
+    await transporter.verify();
+    console.log('Email service is ready to send emails');
+    return true;
+  } catch (error) {
+    console.error('Email service error:', error);
+    return false;
+  }
+};
+
+// Asegúrate de llamar a esto cuando inicia el servidor
 
 const emailService = {
   /**

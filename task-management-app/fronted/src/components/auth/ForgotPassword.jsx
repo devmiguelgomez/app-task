@@ -27,6 +27,8 @@ const ForgotPassword = () => {
     try {
       const response = await authAPI.forgotPassword(email);
       
+      console.log('Password reset response:', response);
+      
       if (response.success) {
         console.log('Password reset requested for:', email);
         setIsSubmitted(true);
@@ -36,7 +38,6 @@ const ForgotPassword = () => {
     } catch (error) {
       console.error('Password reset error:', error);
       setError(
-        error.response?.data?.error || 
         error.message || 
         'No pudimos procesar tu solicitud. Por favor, intenta más tarde.'
       );

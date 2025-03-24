@@ -1,7 +1,7 @@
 // Modificar la URL base de la API para que apunte correctamente a tu backend
 
-// Asegurarse de que esta URL sea correcta y esté accesible
-const API_URL = 'https://app-task-backend.vercel.app/api';
+// Asegúrate de que API_URL esté correctamente definido
+const API_URL = 'https://app-task-backend.vercel.app'; // Verifica esta URL
 
 // Alternativa con detección automática de entorno
 /*
@@ -106,6 +106,7 @@ export const authAPI = {
   // Forgot password
   forgotPassword: async (email) => {
     try {
+      // Asegúrate de que la ruta sea exactamente igual a la configurada en el backend
       const response = await fetch(`${API_URL}/api/users/forgot-password`, {
         method: 'POST',
         headers: {
@@ -114,16 +115,23 @@ export const authAPI = {
         body: JSON.stringify({ email }),
       });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw { response: { data } };
+      // Verifica si la respuesta es HTML (error) antes de intentar parsear JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw { message: data.error || 'Error en el servidor' };
+        }
+        
+        return data;
+      } else {
+        // Si recibimos HTML u otro formato, es un error
+        throw { message: `Error del servidor: ${response.status} ${response.statusText}` };
       }
-      
-      return data;
     } catch (error) {
       console.error('Error in forgotPassword API call:', error);
-      throw error;
+      throw { message: error.message || 'Error de conexión con el servidor' };
     }
   },
 
